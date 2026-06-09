@@ -1,0 +1,43 @@
+/* =============================================================
+   Estilos del módulo PERT-CPM
+   Cargado desde index.html para todos los fragmentos del módulo.
+   ============================================================= */
+
+/* Área placeholder para diagramas SVG / Gantt */
+.diagrama-placeholder {
+    min-height: 350px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb;
+    color: #9ca3af;
+}
+
+.diagrama-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Botón de agregar fila con borde punteado */
+.btn-agregar-fila {
+    border: 2px dashed #4f46e5;
+    color: #4f46e5;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-agregar-fila:hover {
+    background-color: #4f46e5;
+    color: #fff;
+}
+
+/* Resaltado de actividades en la ruta crítica (holgura = 0) */
+.ruta-critica {
+    background-color: #fff5f5;
+    color: #e74c3c;
+    font-weight: 600;
+}

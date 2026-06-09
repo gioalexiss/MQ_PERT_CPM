@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERT-CPM App</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/pert-cpm.css}">
+    <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" type="image/x-icon">
+</head>
+
+<body>
+<div id="app">
+
+    <!-- ================================================================
+         SIDEBAR
+         Cada item del sidebar llama a loadPage('nombre-fragmento').
+         La clase "active" en el <li> se gestiona desde setActive().
+         ================================================================ -->
+    <div id="sidebar" class="active">
+        <div class="sidebar-wrapper active">
+
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <div class="d-flex justify-content-between">
+                    <div class="logo">
+                        <a href="#"><img th:src="@{/assets/images/logo/logo.png}" alt="Logo"></a>
+                    </div>
+                    <div class="toggler">
+                        <a href="#" class="sidebar-hide d-xl-none d-block">
+                            <i class="bi bi-x bi-middle"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú de navegación -->
+            <div class="sidebar-menu">
+                <ul class="menu">
+                    <li class="sidebar-title">Menú</li>
+
+                    <!-- Dashboard -->
+                    <li class="sidebar-item active" id="nav-dashboard">
+                        <a href="#" class="sidebar-link" onclick="loadPage('dashboard'); return false;">
+                            <i class="bi bi-grid-fill"></i>
+                            <span>Inicio</span>
+                        </a>
+                    </li>
+
+                    <!-- PERT-CPM -->
+                    <li class="sidebar-item" id="nav-pert-cpm">
+                        <a href="#" class="sidebar-link" onclick="loadPage('pert-cpm'); return false;">
+                            <i class="bi bi-diagram-3-fill"></i>
+                            <span>PERT-CPM</span>
+                        </a>
+                    </li>
+
+                    <!-- Documentación -->
+                    <li class="sidebar-item" id="nav-documentacion">
+                        <a href="#" class="sidebar-link" onclick="loadPage('pert-cpm'); return false;">
+                            <i class="bi bi-diagram-3-fill"></i>
+                            <span>Documentacion</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+        </div>
+    </div>
+    <!-- FIN SIDEBAR -->
+
+    <div id="main">
+        <!-- Burger para móvil -->
+        <header class="mb-3">
+            <a href="#" class="burger-btn d-block d-xl-none">
+                <i class="bi bi-justify fs-3"></i>
+            </a>
+        </header>
+
+        <!-- ============================================================
+             CONTENEDOR DINÁMICO
+             El dashboard se incluye directamente desde el servidor.
+             Al navegar a otra página, AJAX reemplaza este contenido.
+             No modificar el id "main-content".
+             ============================================================ -->
+        <div id="main-content" th:insert="~{fragmentos/dashboard}">
+        </div>
+
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2021 &copy; Mazer</p>
+                </div>
+                <div class="float-end">
+                    <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span>
+                        by <a href="http://ahmadsaugi.com">A. Saugi</a></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</div><!-- fin #app -->
+
+<!-- ================================================================
+     SCRIPTS BASE DE MAZER
+     ================================================================ -->
+<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+
+<!-- Módulo PERT-CPM: debe ir ANTES de app-navigation.js -->
+<script th:src="@{/assets/js/pert-cpm.js}"></script>
+<script th:src="@{/assets/js/app-navigation.js}"></script>
+
+</body>
+
+</html>
