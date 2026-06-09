@@ -1,10 +1,3 @@
-<!-- ============================================================
-     FRAGMENTO: pert-cpm.html
-     Página PERT-CPM con 4 tabs. Se inyecta en #main-content de index.html.
-     NO incluye <html>, <head>, sidebar ni navbar.
-     Estilos propios del módulo: assets/css/pert-cpm.css
-     ============================================================ -->
-
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -15,10 +8,6 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
-<<<<<<< HEAD
-                        <!-- Al ser un fragmento, el enlace llama a loadPage en lugar de navegar -->
-=======
->>>>>>> origin/master
                         <li class="breadcrumb-item">
                             <a href="#" onclick="loadPage('dashboard'); return false;">Dashboard</a>
                         </li>
@@ -45,62 +34,6 @@
 
                         <!-- ===== TABS DE NAVEGACIÓN ===== -->
                         <ul class="nav nav-tabs mb-3" id="pertTabs" role="tablist">
-<<<<<<< HEAD
-
-                            <!-- Tab 1: Actividades -->
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active"
-                                   id="tab-actividades"
-                                   data-bs-toggle="tab"
-                                   href="#actividades"
-                                   role="tab"
-                                   aria-controls="actividades"
-                                   aria-selected="true">
-                                    <i class="bi bi-table me-1"></i>
-                                    Actividades
-                                </a>
-                            </li>
-
-                            <!-- Tab 2: Diagrama PERT -->
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link"
-                                   id="tab-diagrama"
-                                   data-bs-toggle="tab"
-                                   href="#diagrama"
-                                   role="tab"
-                                   aria-controls="diagrama"
-                                   aria-selected="false">
-                                    <i class="bi bi-share-fill me-1"></i>
-                                    Diagrama PERT
-                                </a>
-                            </li>
-
-                            <!-- Tab 3: Ruta Crítica -->
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link"
-                                   id="tab-ruta"
-                                   data-bs-toggle="tab"
-                                   href="#ruta"
-                                   role="tab"
-                                   aria-controls="ruta"
-                                   aria-selected="false">
-                                    <i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i>
-                                    Ruta Crítica
-                                </a>
-                            </li>
-
-                            <!-- Tab 4: Gantt -->
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link"
-                                   id="tab-gantt"
-                                   data-bs-toggle="tab"
-                                   href="#gantt"
-                                   role="tab"
-                                   aria-controls="gantt"
-                                   aria-selected="false">
-                                    <i class="bi bi-bar-chart-steps me-1"></i>
-                                    Gantt
-=======
                             <li class="nav-item" role="presentation">
                                 <a class="nav-link active" id="tab-actividades" data-bs-toggle="tab"
                                    href="#actividades" role="tab" aria-controls="actividades" aria-selected="true">
@@ -123,7 +56,6 @@
                                 <a class="nav-link" id="tab-gantt" data-bs-toggle="tab"
                                    href="#gantt" role="tab" aria-controls="gantt" aria-selected="false">
                                     <i class="bi bi-bar-chart-steps me-1"></i> Gantt
->>>>>>> origin/master
                                 </a>
                             </li>
                         </ul>
@@ -131,58 +63,10 @@
                         <!-- ===== CONTENIDO DE TABS ===== -->
                         <div class="tab-content" id="pertTabsContent">
 
-                            <!-- ─────────────────────────────────────── -->
-<<<<<<< HEAD
-                            <!-- TAB 1: ACTIVIDADES                     -->
-                            <!-- ─────────────────────────────────────── -->
-                            <div class="tab-pane fade show active"
-                                 id="actividades"
-                                 role="tabpanel"
-                                 aria-labelledby="tab-actividades">
-
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-lg" id="tabla-actividades">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 80px;">ID</th>
-                                                <th>Nombre de actividad</th>
-                                                <th style="width: 160px;">Duración (días)</th>
-                                                <th>Predecesoras</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="cuerpo-actividades">
-                                            <!-- Fila de ejemplo -->
-                                            <tr>
-                                                <td>A</td>
-                                                <td>Actividad de ejemplo</td>
-                                                <td>5</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Botones de acción -->
-                                <div class="d-flex gap-2 mt-3">
-                                    <button type="button"
-                                            class="btn btn-agregar-fila"
-                                            id="btn-agregar">
-                                        <i class="bi bi-plus-lg me-1"></i>
-                                        Agregar actividad
-                                    </button>
-
-                                    <button type="button"
-                                            class="btn btn-primary"
-                                            id="btn-calcular">
-                                        <i class="bi bi-calculator-fill me-1"></i>
-                                        Calcular
-=======
-                            <!-- TAB 1: ACTIVIDADES                      -->
-                            <!-- ─────────────────────────────────────── -->
+                            <!-- TAB 1: ACTIVIDADES -->
                             <div class="tab-pane fade show active" id="actividades"
                                  role="tabpanel" aria-labelledby="tab-actividades">
 
-                                <!-- Tabla de actividades -->
                                 <div class="table-responsive">
                                     <table class="table table-hover table-lg" id="tabla-actividades">
                                         <thead>
@@ -196,18 +80,15 @@
                                         </tr>
                                         </thead>
                                         <tbody id="cuerpo-actividades">
-                                        <!-- Las filas se generan dinámicamente con JS -->
                                         </tbody>
                                     </table>
 
-                                    <!-- Estado vacío -->
                                     <div id="estado-vacio" class="text-center text-muted py-5" style="display:none;">
                                         <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                         No hay actividades registradas. ¡Agrega la primera!
                                     </div>
                                 </div>
 
-                                <!-- Botones -->
                                 <div class="d-flex gap-2 mt-3">
                                     <button type="button" class="btn btn-agregar-fila" id="btn-agregar"
                                             onclick="abrirModal()">
@@ -216,32 +97,11 @@
                                     <button type="button" class="btn btn-primary" id="btn-calcular"
                                             onclick="calcular()">
                                         <i class="bi bi-calculator-fill me-1"></i> Calcular
->>>>>>> origin/master
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- ─────────────────────────────────────── -->
-                            <!-- TAB 2: DIAGRAMA PERT                   -->
-                            <!-- ─────────────────────────────────────── -->
-<<<<<<< HEAD
-                            <div class="tab-pane fade"
-                                 id="diagrama"
-                                 role="tabpanel"
-                                 aria-labelledby="tab-diagrama">
-
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Red PERT</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <!-- Área donde se renderizará el grafo SVG -->
-                                        <div class="diagrama-placeholder" id="area-diagrama-pert">
-                                            <i class="bi bi-diagram-3"></i>
-                                            <p class="mb-0 text-center">
-                                                El diagrama se generará al calcular
-                                            </p>
-=======
+                            <!-- TAB 2: DIAGRAMA PERT -->
                             <div class="tab-pane fade" id="diagrama"
                                  role="tabpanel" aria-labelledby="tab-diagrama">
                                 <div class="card">
@@ -250,54 +110,20 @@
                                         <div class="diagrama-placeholder" id="area-diagrama-pert">
                                             <i class="bi bi-diagram-3"></i>
                                             <p class="mb-0 text-center">El diagrama se generará al calcular</p>
->>>>>>> origin/master
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- ─────────────────────────────────────── -->
-                            <!-- TAB 3: RUTA CRÍTICA                    -->
-                            <!-- ─────────────────────────────────────── -->
-<<<<<<< HEAD
-                            <div class="tab-pane fade"
-                                 id="ruta"
-                                 role="tabpanel"
-                                 aria-labelledby="tab-ruta">
-
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Análisis de Tiempos y Holguras</h4>
-                                    </div>
-=======
+                            <!-- TAB 3: RUTA CRÍTICA -->
                             <div class="tab-pane fade" id="ruta"
                                  role="tabpanel" aria-labelledby="tab-ruta">
                                 <div class="card">
                                     <div class="card-header"><h4>Análisis de Tiempos y Holguras</h4></div>
->>>>>>> origin/master
                                     <div class="card-body">
                                         <div class="table-responsive">
                                             <table class="table table-hover table-lg" id="tabla-ruta">
                                                 <thead>
-<<<<<<< HEAD
-                                                    <tr>
-                                                        <!-- ES=Early Start, EF=Early Finish, LS=Late Start, LF=Late Finish -->
-                                                        <th>Actividad</th>
-                                                        <th>ES</th>
-                                                        <th>EF</th>
-                                                        <th>LS</th>
-                                                        <th>LF</th>
-                                                        <th>Holgura</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="cuerpo-ruta">
-                                                    <tr>
-                                                        <td colspan="6" class="text-center text-muted py-4">
-                                                            <i class="bi bi-info-circle me-2"></i>
-                                                            Los resultados se mostrarán al calcular
-                                                        </td>
-                                                    </tr>
-=======
                                                 <tr>
                                                     <th>Actividad</th>
                                                     <th>ES</th><th>EF</th>
@@ -312,7 +138,6 @@
                                                         Los resultados se mostrarán al calcular
                                                     </td>
                                                 </tr>
->>>>>>> origin/master
                                                 </tbody>
                                             </table>
                                         </div>
@@ -320,27 +145,7 @@
                                 </div>
                             </div>
 
-                            <!-- ─────────────────────────────────────── -->
-                            <!-- TAB 4: GANTT                           -->
-                            <!-- ─────────────────────────────────────── -->
-<<<<<<< HEAD
-                            <div class="tab-pane fade"
-                                 id="gantt"
-                                 role="tabpanel"
-                                 aria-labelledby="tab-gantt">
-
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Diagrama de Gantt</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <!-- Área donde se renderizará el diagrama Gantt -->
-                                        <div class="diagrama-placeholder" id="area-gantt">
-                                            <i class="bi bi-bar-chart-steps"></i>
-                                            <p class="mb-0 text-center">
-                                                El diagrama se generará al calcular
-                                            </p>
-=======
+                            <!-- TAB 4: GANTT -->
                             <div class="tab-pane fade" id="gantt"
                                  role="tabpanel" aria-labelledby="tab-gantt">
                                 <div class="card">
@@ -349,33 +154,21 @@
                                         <div class="diagrama-placeholder" id="area-gantt">
                                             <i class="bi bi-bar-chart-steps"></i>
                                             <p class="mb-0 text-center">El diagrama se generará al calcular</p>
->>>>>>> origin/master
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-<<<<<<< HEAD
-                        </div>
-                        <!-- fin tab-content -->
-
-=======
                         </div><!-- fin tab-content -->
->>>>>>> origin/master
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </div>
-<<<<<<< HEAD
-=======
 
 
-<!-- ================================================================
-     MODAL: Agregar / Editar actividad
-     Usa clases Bootstrap de Mazer (modal, form-control, etc.)
-     ================================================================ -->
+<!-- MODAL: Agregar / Editar actividad -->
 <div class="modal fade" id="modalActividad" tabindex="-1"
      aria-labelledby="modalActividadLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -392,7 +185,6 @@
             <div class="modal-body">
                 <div class="row g-3">
 
-                    <!-- ID -->
                     <div class="col-md-4">
                         <label for="act-id" class="form-label fw-semibold">
                             ID / Clave <span class="text-danger">*</span>
@@ -402,7 +194,6 @@
                         <div class="form-text">Identificador único.</div>
                     </div>
 
-                    <!-- Duración -->
                     <div class="col-md-4">
                         <label for="act-duracion" class="form-label fw-semibold">
                             Duración (días) <span class="text-danger">*</span>
@@ -411,7 +202,6 @@
                                placeholder="Ej: 3" min="0" step="0.5">
                     </div>
 
-                    <!-- Nombre -->
                     <div class="col-12">
                         <label for="act-nombre" class="form-label fw-semibold">
                             Nombre de actividad <span class="text-danger">*</span>
@@ -420,14 +210,12 @@
                                placeholder="Ej: Diseño de base de datos">
                     </div>
 
-                    <!-- Predecesoras (tag input) -->
                     <div class="col-12">
                         <label class="form-label fw-semibold">Predecesoras</label>
                         <div id="pred-tag-wrap"
                              class="form-control d-flex flex-wrap gap-1 align-items-center"
                              style="min-height:42px; cursor:text;"
                              onclick="document.getElementById('pred-input').focus()">
-                            <!-- Tags se insertan aquí dinámicamente -->
                             <input type="text" id="pred-input"
                                    style="border:none;outline:none;background:transparent;min-width:120px;flex:1;"
                                    placeholder="Escribe un ID y presiona Enter o coma…"
@@ -437,15 +225,14 @@
                         <div class="form-text">Deja vacío si no tiene predecesoras.</div>
                     </div>
 
-                    <!-- Notas -->
                     <div class="col-12">
                         <label for="act-notas" class="form-label fw-semibold">Descripción / Notas</label>
                         <textarea class="form-control" id="act-notas" rows="3"
                                   placeholder="Información adicional sobre esta actividad…"></textarea>
                     </div>
 
-                </div><!-- fin row -->
-            </div><!-- fin modal-body -->
+                </div>
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
@@ -460,7 +247,7 @@
     </div>
 </div>
 
-<!-- Toast de notificación (Bootstrap) -->
+<!-- Toast de notificación -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
     <div id="toastPert" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive">
         <div class="d-flex">
@@ -472,4 +259,3 @@
 </div>
 
 <script>pertInit();</script>
->>>>>>> origin/master
