@@ -250,7 +250,7 @@ function pertInit() {
 }
 
 /* ================================================================
-   AGREGAR al final de pert-cpm.js  –  Diagrama PERT-CPM
+    Diagrama PERT-CPM
 ================================================================ */
 
 function pertDibujarDiagrama() {
