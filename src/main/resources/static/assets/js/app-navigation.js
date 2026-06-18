@@ -1,21 +1,16 @@
 /* =============================================================
-   Navegación AJAX
+   Navegación AJAX  –  Tema IPN UPIIZ
    Carga fragmentos parciales en #main-content sin recargar la página.
    Los fragmentos viven en /fragmentos/{nombre} → templates/fragmentos/
    ============================================================= */
 
-/**
- * Página actualmente cargada.
- * Se inicializa en 'dashboard' porque ese fragmento ya viene
- * incrustado en index.html — no se necesita un fetch inicial.
- */
 let paginaActual = 'dashboard';
 
-/**
- * Carga el fragmento indicado y lo inyecta en #main-content.
- * @param {string} pagina  Nombre del fragmento, coincide con el archivo
- *                         templates/fragmentos/{pagina}.html
- */
+const titulos = {
+    'dashboard': 'Inicio',
+    'pert-cpm':  'PERT – CPM'
+};
+
 function loadPage(pagina) {
     if (pagina === paginaActual) return;
 
@@ -36,22 +31,13 @@ function loadPage(pagina) {
         });
 }
 
-/**
- * Marca como "active" el item del sidebar que corresponde
- * a la página cargada, quitando el estado anterior.
- * Solo gestiona los items con id "nav-{pagina}".
- * @param {string} pagina
- */
 function setActive(pagina) {
-    /* quitar active previo */
-    document.querySelectorAll('.sidebar-item').forEach(function(el) {
-        el.classList.remove('active');
+    document.querySelectorAll('.nav-menu a').forEach(function(a) {
+        a.classList.remove('active');
     });
-
-    /* activar el item correspondiente si existe */
     var navItem = document.getElementById('nav-' + pagina);
     if (navItem) navItem.classList.add('active');
-}
 
-/* El dashboard ya viene incluido por Thymeleaf en el HTML inicial —
-   no se requiere fetch al cargar. */
+    var titleEl = document.getElementById('navbarTitle');
+    if (titleEl) titleEl.textContent = titulos[pagina] || pagina;
+}

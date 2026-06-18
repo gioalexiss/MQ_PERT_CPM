@@ -1,104 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERT-CPM App</title>
+    <title>PERT-CPM – IPN UPIIZ</title>
 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
-    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
-    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons (para íconos bi-* usados en el módulo PERT-CPM) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS compartido IPN -->
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <!-- CSS específico del módulo PERT-CPM -->
     <link rel="stylesheet" th:href="@{/assets/css/pert-cpm.css}">
-    <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" type="image/x-icon">
 </head>
-
 <body>
-<div id="app">
 
-    <div id="sidebar" class="active">
-        <div class="sidebar-wrapper active">
+    <!-- Toggle sidebar -->
+    <button class="sidebar-toggle" id="sidebarToggle" title="Mostrar/Ocultar menú">
+        <i class="fas fa-bars"></i>
+    </button>
 
-            <div class="sidebar-header">
-                <div class="d-flex justify-content-between">
-                    <div class="logo">
-                        <a href="#"><img th:src="@{/assets/images/logo/logo.png}" alt="Logo"></a>
-                    </div>
-                    <div class="toggler">
-                        <a href="#" class="sidebar-hide d-xl-none d-block">
-                            <i class="bi bi-x bi-middle"></i>
-                        </a>
-                    </div>
-                </div>
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-diagram-project"></i>
             </div>
-
-            <div class="sidebar-menu">
-                <ul class="menu">
-                    <li class="sidebar-title">Menú</li>
-
-                    <li class="sidebar-item active" id="nav-dashboard">
-                        <a href="#" class="sidebar-link" onclick="loadPage('dashboard'); return false;">
-                            <i class="bi bi-grid-fill"></i>
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item" id="nav-pert-cpm">
-                        <a href="#" class="sidebar-link" onclick="loadPage('pert-cpm'); return false;">
-                            <i class="bi bi-diagram-3-fill"></i>
-                            <span>PERT-CPM</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item" id="nav-documentacion">
-                        <a href="#" class="sidebar-link" onclick="loadPage('documentacion'); return false;">
-                            <i class="bi bi-book-fill"></i>
-                            <span>Documentación</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-
-            <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
-        </div>
-    </div>
-
-    <div id="main">
-        <header class="mb-3">
-            <a href="#" class="burger-btn d-block d-xl-none">
-                <i class="bi bi-justify fs-3"></i>
-            </a>
-        </header>
-
-        <div id="main-content" th:insert="~{fragmentos/dashboard}">
+            <h3>PERT – CPM</h3>
+            <p>IPN · UPIIZ · 6CM1</p>
         </div>
 
-        <footer>
-            <div class="footer clearfix mb-0 text-muted">
-                <div class="float-start">
-                    <p>2021 &copy; Mazer</p>
-                </div>
-                <div class="float-end">
-                    <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span>
-                        by <a href="http://ahmadsaugi.com">A. Saugi</a></p>
-                </div>
-            </div>
-        </footer>
+        <nav>
+            <div class="nav-section-title">Módulos</div>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" id="nav-dashboard" class="active"
+                       onclick="loadPage('dashboard'); return false;">
+                        <i class="fas fa-home"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="nav-pert-cpm"
+                       onclick="loadPage('pert-cpm'); return false;">
+                        <i class="fas fa-diagram-project"></i>
+                        <span>PERT-CPM</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ============ MAIN WRAPPER ============ -->
+    <div class="main-wrapper" id="mainWrapper">
+
+        <!-- TOP NAVBAR -->
+        <div class="top-navbar">
+            <h2 class="navbar-title" id="navbarTitle">Inicio</h2>
+            <div class="navbar-actions"></div>
+        </div>
+
+        <!-- MAIN CONTENT: Thymeleaf inyecta el dashboard inicial;
+             app-navigation.js reemplaza innerHTML al navegar -->
+        <div id="main-content" class="main-content" th:insert="~{fragmentos/dashboard}">
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><span class="footer-brand">Sistema PERT-CPM</span> &copy; 2026</p>
+            <p style="font-size:0.82rem; color:#aaa; margin-top:0.3rem;">
+                IPN · UPIIZ · Métodos Cuantitativos para la Toma de Decisiones
+            </p>
+        </div>
+
     </div>
 
-</div>
-
-<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/assets/js/main.js}"></script>
-<script th:src="@{/assets/js/pert-cpm.js}"></script>
-<script th:src="@{/assets/js/app-navigation.js}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sidebar toggle -->
+    <script th:src="@{/js/sidebar.js}"></script>
+    <!-- Navegación AJAX entre fragmentos -->
+    <script th:src="@{/assets/js/app-navigation.js}"></script>
+    <!-- Lógica PERT-CPM -->
+    <script th:src="@{/assets/js/pert-cpm.js}"></script>
 
 </body>
-
 </html>

@@ -1,271 +1,81 @@
-<!-- ============================================================
-     FRAGMENTO: dashboard.html
-     Contenido del dashboard. Se inyecta en #main-content de index.html.
-     NO incluye <html>, <head>, sidebar ni navbar.
-     ============================================================ -->
+<!-- FRAGMENTO: dashboard.html  –  Contenido inicial del dashboard IPN PERT-CPM.
+     Se inyecta en #main-content mediante Thymeleaf (carga inicial) o AJAX.
+     No incluye <html>, <head>, sidebar ni navbar. -->
 
-<div class="page-heading">
-    <h3>Profile Statistics</h3>
+<!-- HERO -->
+<div class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Sistema PERT – CPM</h1>
+            <p>
+                Herramienta interactiva para la planificación y análisis de proyectos
+                mediante los métodos PERT (Program Evaluation and Review Technique)
+                y CPM (Critical Path Method).
+            </p>
+            <span class="hero-badge">
+                <i class="fas fa-circle-dot"></i>
+                Métodos Cuantitativos para la Toma de Decisiones
+            </span>
+        </div>
+        <div class="hero-logo">
+            <div class="hero-logo-box">
+                <i class="fas fa-diagram-project" style="font-size:5rem; color:var(--guinda);"></i>
+            </div>
+            <p style="margin-top:0.8rem; font-size:0.85rem; opacity:0.8;">IPN · UPIIZ</p>
+        </div>
+    </div>
 </div>
 
-<div class="page-content">
-    <section class="row">
-
-        <!-- ── Columna principal ── -->
-        <div class="col-12 col-lg-9">
-
-            <!-- Tarjetas de estadísticas -->
-            <div class="row">
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon purple">
-                                        <i class="iconly-boldShow"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Profile Views</h6>
-                                    <h6 class="font-extrabold mb-0">112.000</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon blue">
-                                        <i class="iconly-boldProfile"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Followers</h6>
-                                    <h6 class="font-extrabold mb-0">183.000</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon green">
-                                        <i class="iconly-boldAdd-User"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Following</h6>
-                                    <h6 class="font-extrabold mb-0">80.000</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon red">
-                                        <i class="iconly-boldBookmark"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Saved Post</h6>
-                                    <h6 class="font-extrabold mb-0">112</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gráfica de visitas al perfil -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Profile Visit</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="chart-profile-visit"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Visitas por región y últimos comentarios -->
-            <div class="row">
-                <div class="col-12 col-xl-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Profile Visit</h4>
-                        </div>
-                        <div class="card-body">
-                            <!-- Europa -->
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-primary" width="32" height="32" fill="blue" style="width:10px">
-                                            <use xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">Europe</h5>
-                                    </div>
-                                </div>
-                                <div class="col-6"><h5 class="mb-0">862</h5></div>
-                                <div class="col-12"><div id="chart-europe"></div></div>
-                            </div>
-                            <!-- América -->
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-success" width="32" height="32" fill="blue" style="width:10px">
-                                            <use xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">America</h5>
-                                    </div>
-                                </div>
-                                <div class="col-6"><h5 class="mb-0">375</h5></div>
-                                <div class="col-12"><div id="chart-america"></div></div>
-                            </div>
-                            <!-- Indonesia -->
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center">
-                                        <svg class="bi text-danger" width="32" height="32" fill="blue" style="width:10px">
-                                            <use xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                        </svg>
-                                        <h5 class="mb-0 ms-3">Indonesia</h5>
-                                    </div>
-                                </div>
-                                <div class="col-6"><h5 class="mb-0">1025</h5></div>
-                                <div class="col-12"><div id="chart-indonesia"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-xl-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Latest Comments</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Comment</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="assets/images/faces/5.jpg">
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Cantik</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">Congratulations on your graduation!</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="assets/images/faces/2.jpg">
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Ganteng</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">Wow amazing design! Can you make another tutorial for this design?</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- ACERCA DEL PROYECTO -->
+<div class="content-block">
+    <h2><i class="fas fa-book-open" style="color:var(--guinda);"></i> Acerca del Proyecto</h2>
+    <p>
+        Este sistema implementa los métodos <strong>PERT</strong> y <strong>CPM</strong>
+        para la gestión de proyectos. Permite registrar actividades con sus duraciones
+        y dependencias, calcular los tiempos de inicio y fin tempranos y tardíos,
+        identificar la <strong>ruta crítica</strong> y visualizar el diagrama de Gantt.
+    </p>
+    <p>
+        La plataforma facilita la comprensión del análisis de redes, mostrando de forma
+        clara las holguras de cada actividad y cuáles conforman la ruta crítica del proyecto.
+    </p>
+    <div class="pill-grid">
+        <div class="pill">
+            <i class="fas fa-network-wired"></i> Red PERT
         </div>
-
-        <!-- ── Columna lateral derecha ── -->
-        <div class="col-12 col-lg-3">
-            <!-- Perfil -->
-            <div class="card">
-                <div class="card-body py-4 px-5">
-                    <div class="d-flex align-items-center">
-                        <div class="avatar avatar-xl">
-                            <img src="assets/images/faces/1.jpg" alt="Face 1">
-                        </div>
-                        <div class="ms-3 name">
-                            <h5 class="font-bold">John Duck</h5>
-                            <h6 class="text-muted mb-0">@johnducky</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mensajes recientes -->
-            <div class="card">
-                <div class="card-header">
-                    <h4>Recent Messages</h4>
-                </div>
-                <div class="card-content pb-4">
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg"><img src="assets/images/faces/4.jpg"></div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">Hank Schrader</h5>
-                            <h6 class="text-muted mb-0">@johnducky</h6>
-                        </div>
-                    </div>
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg"><img src="assets/images/faces/5.jpg"></div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">Dean Winchester</h5>
-                            <h6 class="text-muted mb-0">@imdean</h6>
-                        </div>
-                    </div>
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg"><img src="assets/images/faces/1.jpg"></div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">John Dodol</h5>
-                            <h6 class="text-muted mb-0">@dodoljohn</h6>
-                        </div>
-                    </div>
-                    <div class="px-4">
-                        <button class="btn btn-block btn-xl btn-light-primary font-bold mt-3">
-                            Start Conversation
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Visitors Profile -->
-            <div class="card">
-                <div class="card-header">
-                    <h4>Visitors Profile</h4>
-                </div>
-                <div class="card-body">
-                    <div id="chart-visitors-profile"></div>
-                </div>
-            </div>
+        <div class="pill">
+            <i class="fas fa-route"></i> Ruta Crítica (CPM)
         </div>
+        <div class="pill">
+            <i class="fas fa-clock"></i> Análisis de Tiempos
+        </div>
+        <div class="pill">
+            <i class="fas fa-chart-bar"></i> Diagrama de Gantt
+        </div>
+    </div>
+</div>
 
-    </section>
+<!-- INFORMACIÓN GENERAL -->
+<div class="info-cards">
+    <div class="info-card">
+        <h3>🏫 Institución</h3>
+        <p>
+            <strong>Instituto Politécnico Nacional</strong><br>
+            Unidad Profesional Interdisciplinaria de Ingeniería – Zacatecas (UPIIZ)
+        </p>
+    </div>
+    <div class="info-card">
+        <h3>📚 Materia</h3>
+        <p>
+            <strong>Métodos Cuantitativos para la Toma de Decisiones</strong><br>
+            Mtra. Yesika Yuriri Rodríguez Martínez
+        </p>
+    </div>
+    <div class="info-card">
+        <h3>🎓 Semestre</h3>
+        <p>
+            <strong>Grupo 6CM1</strong><br>
+            Ingeniería en Sistemas Computacionales
+        </p>
+    </div>
 </div>

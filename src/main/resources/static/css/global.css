@@ -1,0 +1,409 @@
+/* =====================================================
+   global.css  –  Métodos Cuantitativos IPN · UPIIZ
+   Compartido por todas las páginas del proyecto
+   ===================================================== */
+
+/* ---------- Variables ---------- */
+:root {
+    --guinda:       #7B1034;
+    --guinda-dark:  #550A22;
+    --guinda-light: #9E1A44;
+    --guinda-alpha: rgba(123, 16, 52, 0.15);
+    --white:        #ffffff;
+    --off-white:    #f8f5f6;
+    --border-light: rgba(255, 255, 255, 0.15);
+    --sidebar-w:    280px;
+}
+
+/* ---------- Reset ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--off-white);
+    overflow-x: hidden;
+}
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: linear-gradient(160deg, var(--guinda-dark) 0%, var(--guinda) 60%, var(--guinda-light) 100%);
+    color: var(--white);
+    padding: 2rem 0;
+    box-shadow: 4px 0 20px rgba(85, 10, 34, 0.3);
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
+
+.sidebar-header {
+    padding: 0 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sidebar-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-header p {
+    font-size: 0.82rem;
+    opacity: 0.85;
+    margin: 0;
+}
+
+.sidebar-logo {
+    width: 52px;
+    height: 52px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.6rem;
+}
+
+/* ---------- Menú de navegación ---------- */
+.nav-menu {
+    list-style: none;
+    padding: 0 1rem;
+}
+
+.nav-menu li {
+    margin-bottom: 0.4rem;
+}
+
+.nav-menu a {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.nav-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    transform: translateX(4px);
+}
+
+.nav-menu a.active {
+    background-color: rgba(255, 255, 255, 0.22);
+    color: var(--white);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.nav-menu i {
+    margin-right: 0.9rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    opacity: 0.85;
+}
+
+.nav-section-title {
+    padding: 0.5rem 2.2rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-top: 0.8rem;
+    margin-bottom: 0.3rem;
+}
+
+/* ---------- Scrollbar ---------- */
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.08); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+
+/* ============ TOGGLE BUTTON ============ */
+.sidebar-toggle {
+    position: fixed;
+    top: 1.3rem;
+    left: calc(var(--sidebar-w) + 1rem);
+    z-index: 1100;
+    background: var(--guinda);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(85, 10, 34, 0.35);
+    transition: left 0.3s ease, background 0.2s;
+}
+
+.sidebar-toggle:hover {
+    background: var(--guinda-dark);
+}
+
+.sidebar-toggle.collapsed {
+    left: 1rem;
+}
+
+/* ============ LAYOUT ============ */
+.main-wrapper {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    background-color: var(--off-white);
+    transition: margin-left 0.3s ease;
+}
+
+.main-wrapper.expanded {
+    margin-left: 0;
+}
+
+/* ---------- Top Navbar ---------- */
+.top-navbar {
+    background: var(--white);
+    padding: 1.3rem 2rem 1.3rem 4.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.navbar-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--guinda-dark);
+    margin: 0;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* ---------- Área de contenido ---------- */
+.main-content {
+    padding: 2rem;
+}
+
+/* ============ COMPONENTES REUTILIZABLES ============ */
+
+/* --- Cards genéricas --- */
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: var(--white);
+    padding: 1.8rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+    border-left: 5px solid var(--guinda);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(123, 16, 52, 0.12);
+}
+
+.info-card h3 {
+    color: var(--guinda-dark);
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.info-card p {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Bloque de contenido blanco --- */
+.content-block {
+    background: var(--white);
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+}
+
+.content-block h2 {
+    color: var(--guinda-dark);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.content-block p {
+    color: #555;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+}
+
+.content-block p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Pills / etiquetas --- */
+.pill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: var(--off-white);
+    border: 1px solid #e8d5da;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--guinda-dark);
+}
+
+.pill i {
+    font-size: 1rem;
+    color: var(--guinda);
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    background: linear-gradient(135deg, var(--guinda-dark) 0%, var(--guinda) 60%, var(--guinda-light) 100%);
+    color: var(--white);
+    padding: 3rem 2.5rem;
+    border-radius: 14px;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 24px rgba(85, 10, 34, 0.25);
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.hero-text h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero-text p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    opacity: 0.93;
+    margin-bottom: 1.2rem;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 30px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.hero-logo {
+    text-align: center;
+}
+
+.hero-logo-box {
+    width: 150px;
+    height: 150px;
+    background-color: var(--white);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0.8rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.hero-logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* --- Footer --- */
+.footer {
+    background: var(--white);
+    color: #888;
+    text-align: center;
+    padding: 1.8rem 2rem;
+    border-top: 1px solid #eadbdf;
+    margin-top: 3rem;
+}
+
+.footer p {
+    margin: 0.4rem 0;
+    font-size: 0.9rem;
+}
+
+.footer-brand {
+    font-weight: 700;
+    color: var(--guinda-dark);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    :root { --sidebar-w: 260px; }
+
+    .main-content { padding: 1rem; }
+    .hero-content { grid-template-columns: 1fr; }
+    .hero-text h1 { font-size: 1.7rem; }
+    .top-navbar { padding: 1rem 1rem 1rem 4rem; }
+}
+
+@media (max-width: 576px) {
+    :root { --sidebar-w: 240px; }
+
+    .hero-section { padding: 1.5rem 1rem; }
+    .hero-text h1 { font-size: 1.4rem; }
+    .hero-logo-box { width: 110px; height: 110px; }
+    .info-cards { grid-template-columns: 1fr; gap: 1rem; }
+    .navbar-title { font-size: 1.1rem; }
+}
