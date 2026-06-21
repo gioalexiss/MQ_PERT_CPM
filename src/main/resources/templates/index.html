@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERT-CPM – IPN UPIIZ</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons (para íconos bi-* usados en el módulo PERT-CPM) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS compartido IPN -->
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <!-- CSS específico del módulo PERT-CPM -->
+    <link rel="stylesheet" th:href="@{/assets/css/pert-cpm.css}">
+</head>
+<body>
+
+    <!-- Toggle sidebar -->
+    <button class="sidebar-toggle" id="sidebarToggle" title="Mostrar/Ocultar menú">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-diagram-project"></i>
+            </div>
+            <h3>PERT – CPM</h3>
+            <p>IPN · UPIIZ · 6CM1</p>
+        </div>
+
+        <nav>
+            <div class="nav-section-title">Módulos</div>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" id="nav-pert-cpm" class="active"
+                       onclick="loadPage('pert-cpm'); return false;">
+                        <i class="fas fa-diagram-project"></i>
+                        <span>PERT-CPM</span>
+                    </a>
+                </li>
+                <!--===DOCUMENTACIÓN===-->
+                <li>
+                    <a href="#" id="nav-documentacion" onclick="loadPage('documentacion'); return false;">
+                        <i class="fas fa-book"></i> Documentación
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ============ MAIN WRAPPER ============ -->
+    <div class="main-wrapper" id="mainWrapper">
+
+        <!-- TOP NAVBAR -->
+        <div class="top-navbar">
+            <h2 class="navbar-title" id="navbarTitle">PERT – CPM</h2>
+            <div class="navbar-actions"></div>
+        </div>
+
+        <!-- MAIN CONTENT: Thymeleaf inyecta el dashboard inicial;
+             app-navigation.js reemplaza innerHTML al navegar -->
+        <div id="main-content" class="main-content" th:insert="~{fragmentos/pert-cpm}">
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><span class="footer-brand">Sistema PERT-CPM</span> &copy; 2026</p>
+            <p style="font-size:0.82rem; color:#aaa; margin-top:0.3rem;">
+                IPN · UPIIZ · Métodos Cuantitativos para la Toma de Decisiones
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sidebar toggle -->
+    <script th:src="@{/js/sidebar.js}"></script>
+    <!-- Navegación AJAX entre fragmentos -->
+    <script th:src="@{/assets/js/app-navigation.js}"></script>
+    <!-- Lógica PERT-CPM -->
+    <script th:src="@{/assets/js/pert-cpm.js}"></script>
+
+    <script th:inline="none">
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <script>
+        // En tu función original loadPage(), añade MathJax.typeset() al finalizar la carga AJAX
+        // para obligar a MathJax a procesar las fórmulas del nuevo código inyectado.
+    </script>
+
+</body>
+</html>

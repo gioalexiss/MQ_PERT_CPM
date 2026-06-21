@@ -1,0 +1,389 @@
+/* =============================================================
+   Estilos del módulo PERT-CPM  –  Tema IPN UPIIZ
+   ============================================================= */
+
+/* Override Bootstrap primary → guinda IPN */
+.btn-primary {
+    background-color: var(--guinda);
+    border-color: var(--guinda);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--guinda-dark) !important;
+    border-color: var(--guinda-dark) !important;
+}
+.text-primary { color: var(--guinda) !important; }
+
+/* Tabs PERT-CPM en tema IPN */
+.nav-tabs .nav-link.active {
+    color: var(--guinda);
+    border-bottom-color: var(--guinda);
+    font-weight: 600;
+}
+.nav-tabs .nav-link:hover { color: var(--guinda-light); }
+
+/* Área placeholder para diagramas SVG / Gantt */
+.diagrama-placeholder {
+    min-height: 350px;
+    border: 2px dashed #c9a0aa;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--off-white);
+    color: #b08090;
+}
+
+.diagrama-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Botón de agregar fila con borde punteado en guinda */
+.btn-agregar-fila {
+    border: 2px dashed var(--guinda);
+    color: var(--guinda);
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-agregar-fila:hover {
+    background-color: var(--guinda);
+    color: #fff;
+}
+
+/* Resaltado de actividades en la ruta crítica (holgura = 0) */
+.ruta-critica {
+    background-color: #fff5f5;
+    color: #c0392b;
+    font-weight: 600;
+}
+.ruta-critica td { border-left: 3px solid #c0392b; }
+.ruta-critica td:first-child { border-left-width: 4px; }
+
+/* Banner de resultado de ruta crítica */
+.rc-banner {
+    border: 1.5px solid #e74c3c;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.rc-banner-header {
+    background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+    color: #fff;
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.rc-banner-path {
+    padding: 12px 16px;
+    background: #fff5f5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    font-size: 1rem;
+}
+.rc-banner-note {
+    padding: 8px 16px;
+    background: #fef9e7;
+    color: #7d6608;
+    font-size: 0.82rem;
+    border-top: 1px solid #f9e79f;
+}
+
+/* Leyenda */
+.rc-leyenda {
+    display: flex;
+    gap: 20px;
+    font-size: 0.82rem;
+    color: #666;
+}
+.rc-leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.rc-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* ── Barra de progreso ──────────────────────────────────── */
+.calc-progress-track {
+    height: 7px;
+    border-radius: 4px;
+    background-color: #f0e8ec;
+}
+.calc-progress-track .progress-bar {
+    background-color: var(--guinda) !important;
+    border-radius: 4px;
+}
+
+/* ── Notificación animada (top-right) ───────────────────── */
+.pert-notif {
+    position: fixed;
+    top: 4.8rem;
+    right: 1.2rem;
+    z-index: 10000;
+    height: 46px;
+    min-width: 270px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    animation: pertNotifSlide 4s ease-in-out forwards;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pert-notif-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    height: 100%;
+    color: #fff;
+    font-size: 0.87rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.pert-notif-inner i {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+@keyframes pertNotifSlide {
+    0%   { transform: translateX(110%); opacity: 0; }
+    8%   { transform: translateX(0);    opacity: 1; }
+    11%  { transform: translateX(-6px); }
+    14%  { transform: translateX(0); }
+    82%  { transform: translateX(0);    opacity: 1; }
+    100% { transform: translateX(110%); opacity: 0; }
+}
+
+/* ── Modal de confirmación de eliminación ───────────────── */
+.modal-eliminar-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px 16px;
+    background: linear-gradient(135deg, var(--guinda-dark) 0%, var(--guinda) 100%);
+    color: #fff;
+}
+.modal-eliminar-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* ── Fila de edición inline ─────────────────────────────── */
+.fila-edicion {
+    background-color: #faf8fa !important;
+    border-top: 2px solid var(--guinda);
+    border-bottom: 2px solid var(--guinda);
+}
+.fila-edicion td {
+    padding: 6px 8px !important;
+    vertical-align: middle;
+}
+
+.inline-pred-wrap {
+    position: relative;
+    min-width: 140px;
+}
+.inline-pred-display {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    min-height: 31px;
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    background: #fff;
+    flex-wrap: wrap;
+    transition: border-color 0.15s;
+}
+.inline-pred-display:hover { border-color: var(--guinda); }
+.inline-pred-display .chevron {
+    margin-left: auto;
+    font-size: 0.65rem;
+    color: #888;
+    flex-shrink: 0;
+}
+
+.inline-pred-dropdown {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+    min-width: 200px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+.inline-pred-dropdown.open { display: block; }
+
+.inline-pred-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.83rem;
+    transition: background 0.1s;
+}
+.inline-pred-option:hover { background: #f5f0f5; }
+.inline-pred-option input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--guinda);
+    flex-shrink: 0;
+}
+.inline-pred-empty {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    color: #aaa;
+    font-style: italic;
+}
+
+/* ── Panel de zoom flotante ─────────────────────────────── */
+.diag-zoom-panel {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+.diag-zoom-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: background 0.15s, color 0.15s;
+}
+.diag-zoom-btn:hover { background: var(--guinda); color: #fff; border-color: var(--guinda); }
+.diag-zoom-sep {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 2px 0;
+}
+
+/* ── Barra de reproducción ──────────────────────────────── */
+.diag-pb-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    background: #f3eef1;
+    border-top: 1px solid #e2d8de;
+    border-radius: 0 0 8px 8px;
+}
+.diag-pb-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+.diag-pb-btn:hover { background: var(--guinda); color: #fff; border-color: var(--guinda); }
+.diag-pb-main {
+    background: var(--guinda);
+    color: #fff;
+    border-color: var(--guinda);
+    width: 34px;
+    height: 34px;
+}
+.diag-pb-main:hover { background: var(--guinda-dark); border-color: var(--guinda-dark); }
+.diag-pb-slider {
+    flex: 1;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--guinda);
+    margin: 0 6px;
+}
+.diag-pb-label {
+    font-size: 0.75rem;
+    color: #888;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ── Gantt ───────────────────────────────────────────────── */
+.gantt-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.82rem;
+    color: #666;
+    padding: 8px 12px;
+    background: #f8f5f8;
+    border-radius: 6px;
+    border: 1px solid #e8e0e8;
+}
+.gantt-leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.gantt-leg {
+    display: inline-block;
+    width: 30px;
+    height: 13px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+.gantt-leg--crit {
+    background: #e53935;
+    border: 1.5px solid #c62828;
+}
+
+.gantt-leg--norm {
+    background: #1e88e5;
+    border: 1.5px solid #1565c0;
+}
+
+.gantt-leg--slack {
+    background: #dcdcdc;
+    border: 1.5px dashed #bdbdbd;
+}

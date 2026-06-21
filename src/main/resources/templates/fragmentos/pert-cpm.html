@@ -1,0 +1,293 @@
+<!-- HERO -->
+<div class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1><i class="fas fa-diagram-project me-2" style="font-size:1.9rem;"></i>PERT CPM</h1>
+            <p>
+                Herramienta interactiva para la planificación y análisis de proyectos
+                mediante los métodos PERT (Program Evaluation and Review Technique)
+                y CPM (Critical Path Method).
+            </p>
+            <span class="hero-badge">
+                <i class="fas fa-circle-dot"></i>
+                Equipo 5 · Métodos Cuantitativos
+            </span>
+        </div>
+        <div class="hero-logo">
+            <div class="hero-logo-box">
+                <img src="/assets/images/logo/logo.png" alt="IPN UPIIZ">
+            </div>
+            <p style="margin-top:0.8rem; font-size:0.85rem; opacity:0.8;">IPN · UPIIZ</p>
+        </div>
+    </div>
+</div>
+
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>PERT-CPM</h3>
+                <p class="text-subtitle text-muted">Análisis de redes de actividades</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-content">
+    <section class="section">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="bi bi-diagram-3-fill me-2 text-primary"></i>
+                            Herramienta PERT-CPM
+                        </h4>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- ===== TABS DE NAVEGACIÓN ===== -->
+                        <ul class="nav nav-tabs mb-3" id="pertTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="tab-actividades" data-bs-toggle="tab"
+                                   href="#actividades" role="tab" aria-controls="actividades" aria-selected="true">
+                                    <i class="bi bi-table me-1"></i> Actividades
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="tab-diagrama" data-bs-toggle="tab"
+                                   href="#diagrama" role="tab" aria-controls="diagrama" aria-selected="false">
+                                    <i class="bi bi-share-fill me-1"></i> Diagrama PERT
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="tab-ruta" data-bs-toggle="tab"
+                                   href="#ruta" role="tab" aria-controls="ruta" aria-selected="false">
+                                    <i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i> Ruta Crítica
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="tab-gantt" data-bs-toggle="tab"
+                                   href="#gantt" role="tab" aria-controls="gantt" aria-selected="false">
+                                    <i class="bi bi-bar-chart-steps me-1"></i> Gantt
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- ===== CONTENIDO DE TABS ===== -->
+                        <div class="tab-content" id="pertTabsContent">
+
+                            <!-- TAB 1: ACTIVIDADES -->
+                            <div class="tab-pane fade show active" id="actividades"
+                                 role="tabpanel" aria-labelledby="tab-actividades">
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-lg" id="tabla-actividades">
+                                        <thead>
+                                        <tr>
+                                            <th style="width:80px;">ID</th>
+                                            <th>Nombre de actividad</th>
+                                            <th style="width:160px;">Duración (días)</th>
+                                            <th>Predecesoras</th>
+                                            <th>Descripción / Notas</th>
+                                            <th style="width:160px;">Acciones</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="cuerpo-actividades">
+                                        </tbody>
+                                    </table>
+
+                                    <div id="estado-vacio" class="text-center text-muted py-5" style="display:none;">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        No hay actividades registradas. ¡Agrega la primera!
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 mt-3">
+                                    <button type="button" class="btn btn-agregar-fila" id="btn-agregar"
+                                            onclick="pertAgregarFilaInline()">
+                                        <i class="bi bi-plus-lg me-1"></i> Agregar actividad
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btn-calcular"
+                                            onclick="calcular()">
+                                        <i class="bi bi-calculator-fill me-1"></i> Calcular
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary ms-auto" id="btn-ejemplo"
+                                            onclick="pertCargarEjemplo()">
+                                        <i class="bi bi-lightning-fill me-1"></i> Ver Ejemplo
+                                    </button>
+                                </div>
+
+                                <!-- Barra de progreso del cálculo -->
+                                <div id="calc-progress-wrap" class="mt-3" style="display:none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span id="calc-progress-label" class="small text-muted">Calculando…</span>
+                                        <span id="calc-progress-pct" class="small fw-bold" style="color:var(--guinda);">0%</span>
+                                    </div>
+                                    <div class="progress calc-progress-track">
+                                        <div id="calc-progress-bar"
+                                             class="progress-bar progress-bar-striped progress-bar-animated"
+                                             role="progressbar" style="width:0%;"
+                                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TAB 2: DIAGRAMA PERT -->
+                            <div class="tab-pane fade" id="diagrama"
+                                 role="tabpanel" aria-labelledby="tab-diagrama">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="mb-0">Red PERT</h4>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="diagrama-placeholder" id="area-diagrama-pert">
+                                            <i class="bi bi-diagram-3"></i>
+                                            <p class="mb-0 text-center">El diagrama se generará al calcular</p>
+                                        </div>
+                                        <!-- Barra de reproducción -->
+                                        <div id="diag-pb-bar" class="d-none diag-pb-bar">
+                                            <button class="diag-pb-btn" onclick="pertPlayGo(0)" title="Inicio">
+                                                <i class="bi bi-skip-start-fill"></i>
+                                            </button>
+                                            <button class="diag-pb-btn" onclick="pertPlayStep(-1)" title="Anterior">
+                                                <i class="bi bi-skip-backward-fill"></i>
+                                            </button>
+                                            <button class="diag-pb-btn diag-pb-main" id="diag-pb-play"
+                                                    onclick="pertPlayToggle()" title="Reproducir">
+                                                <i class="bi bi-play-fill"></i>
+                                            </button>
+                                            <button class="diag-pb-btn" onclick="pertPlayStep(1)" title="Siguiente">
+                                                <i class="bi bi-skip-forward-fill"></i>
+                                            </button>
+                                            <button class="diag-pb-btn" onclick="pertPlayGo(-1)" title="Final">
+                                                <i class="bi bi-skip-end-fill"></i>
+                                            </button>
+                                            <input type="range" id="diag-pb-slider" class="diag-pb-slider"
+                                                   min="0" value="0" oninput="pertPlaySeek(+this.value)">
+                                            <span id="diag-pb-label" class="diag-pb-label">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TAB 3: RUTA CRÍTICA -->
+                            <div class="tab-pane fade" id="ruta"
+                                 role="tabpanel" aria-labelledby="tab-ruta">
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h4 class="mb-0">Análisis de Tiempos y Holguras</h4>
+                                        <span class="badge bg-secondary">ES = Inicio Temprano &nbsp;·&nbsp; EF = Fin Temprano &nbsp;·&nbsp; LS = Inicio Tardío &nbsp;·&nbsp; LF = Fin Tardío</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="rc-resumen"></div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-lg" id="tabla-ruta">
+                                                <thead class="table-light">
+                                                <tr>
+                                                    <th>Actividad</th>
+                                                    <th class="text-center" title="Early Start – Inicio más temprano posible">ES</th>
+                                                    <th class="text-center" title="Early Finish – Fin más temprano posible">EF</th>
+                                                    <th class="text-center" title="Late Start – Inicio más tardío sin retrasar el proyecto">LS</th>
+                                                    <th class="text-center" title="Late Finish – Fin más tardío sin retrasar el proyecto">LF</th>
+                                                    <th class="text-center">Duración</th>
+                                                    <th class="text-center">Holgura</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="cuerpo-ruta">
+                                                <tr>
+                                                    <td colspan="7" class="text-center text-muted py-4">
+                                                        <i class="bi bi-info-circle me-2"></i>
+                                                        Los resultados se mostrarán al calcular
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="rc-leyenda mt-2">
+                                            <span class="rc-leyenda-item critica"><span class="rc-dot bg-danger"></span> Actividad crítica (Holgura = 0)</span>
+                                            <span class="rc-leyenda-item"><span class="rc-dot bg-success"></span> Actividad no crítica</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TAB 4: GANTT -->
+                            <div class="tab-pane fade" id="gantt"
+                                 role="tabpanel" aria-labelledby="tab-gantt">
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h4 class="mb-0">
+                                            <i class="bi bi-bar-chart-steps me-2"></i>Diagrama de Gantt
+                                        </h4>
+                                        <span id="gantt-duracion-total"></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="gantt-leyenda" class="d-none gantt-leyenda mb-3">
+                                            <span class="gantt-leyenda-item">
+                                                <span class="gantt-leg gantt-leg--crit"></span> Ruta crítica
+                                            </span>
+                                            <span class="gantt-leyenda-item">
+                                                <span class="gantt-leg gantt-leg--norm"></span> No crítica
+                                            </span>
+                                            <span class="gantt-leyenda-item">
+                                                <span class="gantt-leg gantt-leg--slack"></span> Holgura disponible
+                                            </span>
+                                        </div>
+                                        <div class="diagrama-placeholder" id="area-gantt">
+                                            <i class="bi bi-bar-chart-steps"></i>
+                                            <p class="mb-0 text-center">El diagrama se generará al calcular</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- fin tab-content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+<!-- Modal: Confirmar eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content border-0 shadow-lg overflow-hidden">
+
+            <div class="modal-eliminar-header">
+                <div class="modal-eliminar-icon">
+                    <i class="bi bi-trash3-fill"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Eliminar actividad</h5>
+                    <p class="mb-0 opacity-75 small">Esta acción no se puede deshacer</p>
+                </div>
+            </div>
+
+            <div class="modal-body px-4 py-3">
+                <p class="mb-0 text-center" style="color:#444;">
+                    ¿Deseas eliminar la actividad
+                    <span id="modal-eliminar-id" class="badge bg-danger px-2 py-1 mx-1" style="font-size:.9rem;"></span>?
+                </p>
+                <p class="text-center text-muted small mt-1 mb-0" id="modal-eliminar-nombre"></p>
+            </div>
+
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4"
+                        data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger px-4" id="btn-confirmar-eliminar"
+                        onclick="pertEjecutarEliminar()">
+                    <i class="bi bi-trash3-fill me-1"></i> Eliminar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>pertInit();</script>

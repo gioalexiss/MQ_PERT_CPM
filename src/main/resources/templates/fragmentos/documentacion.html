@@ -1,0 +1,94 @@
+<div class="card p-4 shadow-sm m-4">
+    <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+        <i class="fas fa-book fa-2x text-primary me-3"></i>
+        <div>
+            <h2 class="mb-0">Documentación del Método PERT / CPM</h2>
+            <small class="text-muted">Investigación operativa y fundamentos matemáticos del módulo</small>
+        </div>
+    </div>
+
+    <section class="mb-5">
+        <h4 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>1. Información del Método</h4>
+        <p>
+            El método <strong>PERT (Project Evaluation and Review Technique)</strong> y el <strong>CPM (Critical Path Method)</strong>
+            son dos técnicas de modelado de redes orientadas a la gestión, planificación y optimización de proyectos complejos.
+            Su objetivo matemático primordial consiste en determinar la <strong>Ruta Crítica</strong>, es decir, la secuencia de actividades encadenadas
+            cuyas holguras son nulas, definiendo de forma exacta la duración mínima total del proyecto.
+        </p>
+    </section>
+
+    <section class="mb-5">
+        <h4 class="text-primary mb-3"><i class="fas fa-history me-2"></i>2. Historia y Antecedentes</h4>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="p-3 border rounded h-100 bg-light">
+                    <h5><strong class="text-primary">Método PERT</strong> (1958)</h5>
+                    <p class="small mb-0 text-justify">
+                        Fue desarrollado por la Oficina de Proyectos Especiales de la Marina de los Estados Unidos en conjunto con la firma consultora
+                        Booz, Allen & Hamilton. Se diseñó específicamente para el programa del misil balístico nuclear <em>Polaris</em>, un entorno de altísima
+                        incertidumbre y con más de 3,000 contratistas. Su aplicación logró reducir el tiempo esperado del proyecto en más de dos años.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="p-3 border rounded h-100 bg-light">
+                    <h5><strong class="text-success">Método CPM</strong> (1957)</h5>
+                    <p class="small mb-0 text-justify">
+                        Fue desarrollado de forma casi simultánea por la corporación DuPont junto con la división Remington Rand Univac.
+                        A diferencia de PERT, CPM nació para aplicarse en proyectos industriales estandarizados (como el mantenimiento de plantas químicas),
+                        donde los tiempos y los costos de cada actividad ya se conocían de forma precisa (entorno determinístico).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4">
+        <h4 class="text-primary mb-3"><i class="fas fa-calculator me-2"></i>3. Fundamento Matemático</h4>
+        <p>
+            Para gestionar la incertidumbre de los proyectos, PERT asume que el tiempo de ejecución de cada actividad es una variable aleatoria
+            que modela una <strong>Distribución de Probabilidad Beta</strong>. Se requieren tres estimaciones de tiempo por actividad:
+        </p>
+
+        <div class="bg-dark text-white p-3 rounded mb-4 shadow-sm">
+            <ul class="mb-0 list-unstyled small">
+                <li>🟢 <strong>$a$ (Tiempo Optimista):</strong> Duración mínima si todo marcha a la perfección.</li>
+                <li>🔵 <strong>$m$ (Tiempo Más Probable):</strong> Duración modal, el escenario más realista.</li>
+                <li>🔴 <strong>$b$ (Tiempo Pesimista):</strong> Duración máxima si ocurren retrasos severos.</li>
+            </ul>
+        </div>
+
+        <h5 class="mt-4 text-secondary">Ecuaciones de Estimación</h5>
+
+        <div class="row text-center my-3">
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-light">
+                    <h6>Tiempo Esperado ($t_e$)</h6>
+                    <div class="fs-5 fw-bold">$$t_e = \frac{a + 4m + b}{6}$$</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-light">
+                    <h6>Varianza ($\sigma^2$)</h6>
+                    <div class="fs-5 fw-bold">$$\sigma^2 = \left(\frac{b - a}{6}\right)^2$$</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-light">
+                    <h6>Desviación Estándar ($\sigma$)</h6>
+                    <div class="fs-5 fw-bold">$$\sigma = \frac{b - a}{6}$$</div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="mt-4 text-secondary">Cálculo de Probabilidad del Proyecto</h5>
+        <p>
+            Haciendo uso del Teorema del Límite Central, al sumar las duraciones de las actividades que componen la ruta crítica, la variabilidad total se distribuye de manera Normal.
+            Para evaluar la probabilidad de finalizar el proyecto en una fecha límite comprometida ($D$), calculamos el valor de la variable estandarizada $Z$:
+        </p>
+        <div class="p-3 bg-light border text-center rounded fs-4 mb-3 text-primary">
+            $$Z = \frac{D - \sum t_{e(\text{Críticos})}}{\sqrt{\sum \sigma^2_{\text{(Críticos)}}}}$$
+        </div>
+        <p class="small text-muted">Finalmente, el valor de $Z$ se localiza en la tabla de distribución normal estándar para conocer el porcentaje probabilístico de éxito de la entrega.</p>
+    </section>
+</div>

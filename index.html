@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERT CPM – Sistema de Optimización</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+
+    <style>
+        /* =============================================================
+           Estilos del módulo PERT-CPM  –  Tema IPN UPIIZ
+           ============================================================= */
+
+        /* Override Bootstrap primary → guinda IPN */
+        .btn-primary {
+            background-color: var(--guinda);
+            border-color: var(--guinda);
+        }
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: var(--guinda-dark) !important;
+            border-color: var(--guinda-dark) !important;
+        }
+        .text-primary { color: var(--guinda) !important; }
+
+        /* Tabs PERT-CPM en tema IPN */
+        .nav-tabs .nav-link.active {
+            color: var(--guinda);
+            border-bottom-color: var(--guinda);
+            font-weight: 600;
+        }
+        .nav-tabs .nav-link:hover { color: var(--guinda-light); }
+
+        /* Área placeholder para diagramas SVG / Gantt */
+        .diagrama-placeholder {
+            min-height: 350px;
+            border: 2px dashed #c9a0aa;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--off-white);
+            color: #b08090;
+        }
+        .diagrama-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Botón de agregar fila con borde punteado en guinda */
+        .btn-agregar-fila {
+            border: 2px dashed var(--guinda);
+            color: var(--guinda);
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .btn-agregar-fila:hover {
+            background-color: var(--guinda);
+            color: #fff;
+        }
+
+        /* Resaltado de actividades en la ruta crítica (holgura = 0) */
+        .ruta-critica {
+            background-color: #fff5f5;
+            color: #c0392b;
+            font-weight: 600;
+        }
+        .ruta-critica td { border-left: 3px solid #c0392b; }
+        .ruta-critica td:first-child { border-left-width: 4px; }
+
+        /* Banner de resultado de ruta crítica */
+        .rc-banner {
+            border: 1.5px solid #e74c3c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .rc-banner-header {
+            background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+            color: #fff;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .rc-banner-path {
+            padding: 12px 16px;
+            background: #fff5f5;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            font-size: 1rem;
+        }
+        .rc-banner-note {
+            padding: 8px 16px;
+            background: #fef9e7;
+            color: #7d6608;
+            font-size: 0.82rem;
+            border-top: 1px solid #f9e79f;
+        }
+
+        /* Leyenda */
+        .rc-leyenda {
+            display: flex;
+            gap: 20px;
+            font-size: 0.82rem;
+            color: #666;
+        }
+        .rc-leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .rc-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* ── Barra de progreso ──────────────────────────────────── */
+        .calc-progress-track {
+            height: 7px;
+            border-radius: 4px;
+            background-color: #f0e8ec;
+        }
+        .calc-progress-track .progress-bar {
+            background-color: var(--guinda) !important;
+            border-radius: 4px;
+        }
+
+        /* ── Notificación animada (top-right) ───────────────────── */
+        .pert-notif {
+            position: fixed;
+            top: 4.8rem;
+            right: 1.2rem;
+            z-index: 10000;
+            height: 46px;
+            min-width: 270px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+            animation: pertNotifSlide 4s ease-in-out forwards;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .pert-notif-inner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            height: 100%;
+            color: #fff;
+            font-size: 0.87rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .pert-notif-inner i {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        @keyframes pertNotifSlide {
+            0%   { transform: translateX(110%); opacity: 0; }
+            8%   { transform: translateX(0);    opacity: 1; }
+            11%  { transform: translateX(-6px); }
+            14%  { transform: translateX(0); }
+            82%  { transform: translateX(0);    opacity: 1; }
+            100% { transform: translateX(110%); opacity: 0; }
+        }
+
+        /* ── Modal de confirmación de eliminación ───────────────── */
+        .modal-eliminar-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 24px 16px;
+            background: linear-gradient(135deg, var(--guinda-dark) 0%, var(--guinda) 100%);
+            color: #fff;
+        }
+        .modal-eliminar-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* ── Fila de edición inline ─────────────────────────────── */
+        .fila-edicion {
+            background-color: #faf8fa !important;
+            border-top: 2px solid var(--guinda);
+            border-bottom: 2px solid var(--guinda);
+        }
+        .fila-edicion td {
+            padding: 6px 8px !important;
+            vertical-align: middle;
+        }
+        .inline-pred-wrap {
+            position: relative;
+            min-width: 140px;
+        }
+        .inline-pred-display {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            min-height: 31px;
+            padding: 4px 8px;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            background: #fff;
+            flex-wrap: wrap;
+            transition: border-color 0.15s;
+        }
+        .inline-pred-display:hover { border-color: var(--guinda); }
+        .inline-pred-display .chevron {
+            margin-left: auto;
+            font-size: 0.65rem;
+            color: #888;
+            flex-shrink: 0;
+        }
+        .inline-pred-dropdown {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+            min-width: 200px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        .inline-pred-dropdown.open { display: block; }
+        .inline-pred-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.83rem;
+            transition: background 0.1s;
+        }
+        .inline-pred-option:hover { background: #f5f0f5; }
+        .inline-pred-option input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: var(--guinda);
+            flex-shrink: 0;
+        }
+        .inline-pred-empty {
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        /* ── Panel de zoom flotante ─────────────────────────────── */
+        .diag-zoom-panel {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255,255,255,0.92);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+        }
+        .diag-zoom-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: background 0.15s, color 0.15s;
+        }
+        .diag-zoom-btn:hover { background: var(--guinda); color: #fff; border-color: var(--guinda); }
+        .diag-zoom-sep {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 2px 0;
+        }
+
+        /* ── Barra de reproducción ──────────────────────────────── */
+        .diag-pb-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 14px;
+            background: #f3eef1;
+            border-top: 1px solid #e2d8de;
+            border-radius: 0 0 8px 8px;
+        }
+        .diag-pb-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: background 0.15s, color 0.15s;
+            flex-shrink: 0;
+        }
+        .diag-pb-btn:hover { background: var(--guinda); color: #fff; border-color: var(--guinda); }
+        .diag-pb-main {
+            background: var(--guinda);
+            color: #fff;
+            border-color: var(--guinda);
+            width: 34px;
+            height: 34px;
+        }
+        .diag-pb-main:hover { background: var(--guinda-dark); border-color: var(--guinda-dark); }
+        .diag-pb-slider {
+            flex: 1;
+            height: 4px;
+            cursor: pointer;
+            accent-color: var(--guinda);
+            margin: 0 6px;
+        }
+        .diag-pb-label {
+            font-size: 0.75rem;
+            color: #888;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* ── Gantt ───────────────────────────────────────────────── */
+        .gantt-leyenda {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.82rem;
+            color: #666;
+            padding: 8px 12px;
+            background: #f8f5f8;
+            border-radius: 6px;
+            border: 1px solid #e8e0e8;
+        }
+        .gantt-leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .gantt-leg {
+            display: inline-block;
+            width: 30px;
+            height: 13px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+        .gantt-leg--crit {
+            background: #e53935;
+            border: 1.5px solid #c62828;
+        }
+        .gantt-leg--norm {
+            background: #1e88e5;
+            border: 1.5px solid #1565c0;
+        }
+        .gantt-leg--slack {
+            background: #dcdcdc;
+            border: 1.5px dashed #bdbdbd;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="sidebar-toggle" id="sidebarToggle" title="Mostrar/Ocultar menú">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="fas fa-chart-bar"></i></div>
+            <h3>Optimización Matemática</h3>
+            <p>IPN · UPIIZ · 6CM1</p>
+        </div>
+        <nav>
+            <div class="nav-section-title">Módulos</div>
+            <ul class="nav-menu">
+                <li><a href="/index.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+                <li><a href="/equipo1"><i class="fas fa-bezier-curve"></i><span>Método Gráfico</span></a></li>
+                <li><a href="/equipo2"><i class="fas fa-arrow-trend-up"></i><span>Simplex Maximización</span></a></li>
+                <li><a href="/equipo3"><i class="fas fa-arrow-trend-down"></i><span>Simplex Minimización</span></a></li>
+                <li><a href="/equipo4"><i class="fas fa-sliders"></i><span>Minimización Avanzada</span></a></li>
+                <li><a href="/equipo5" class="active"><i class="fas fa-database"></i><span>PERT CPM</span></a></li>
+                <li><a href="/equipo7"><i class="fas fa-truck"></i><span>Modelo de Transporte</span></a></li>
+                <li><a href="/equipo6"><i class="fas fa-water"></i><span>Flujo Máximo</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper" id="mainWrapper">
+
+        <div class="top-navbar">
+            <h2 class="navbar-title" id="navbarTitle">PERT CPM</h2>
+            <div class="navbar-actions"></div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1><i class="fas fa-diagram-project" style="opacity:0.85;"></i> PERT CPM</h1>
+                        <p>
+                            Herramienta interactiva para la planificación y análisis de proyectos
+                            mediante los métodos PERT (Program Evaluation and Review Technique)
+                            y CPM (Critical Path Method).
+                        </p>
+                        <span class="hero-badge">
+                            <i class="fas fa-circle-dot"></i>
+                            Equipo 5 · Métodos Cuantitativos
+                        </span>
+                    </div>
+                    <div class="hero-logo">
+                        <div class="hero-logo-box"><img src="/img/logotipo_ipn.png" alt="IPN"></div>
+                        <p style="margin-top:0.8rem; font-size:0.85rem; opacity:0.8;">IPN · UPIIZ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── MÓDULO PERT-CPM ── -->
+            <div class="page-content">
+                <section class="section">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="bi bi-diagram-3-fill me-2 text-primary"></i>
+                                        Herramienta PERT-CPM
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+
+                                    <!-- ===== TABS ===== -->
+                                    <ul class="nav nav-tabs mb-3" id="pertTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link active" id="tab-actividades" data-bs-toggle="tab"
+                                               href="#actividades" role="tab" aria-selected="true">
+                                                <i class="bi bi-table me-1"></i> Actividades
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" id="tab-diagrama" data-bs-toggle="tab"
+                                               href="#diagrama" role="tab" aria-selected="false">
+                                                <i class="bi bi-share-fill me-1"></i> Diagrama PERT
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" id="tab-ruta" data-bs-toggle="tab"
+                                               href="#ruta" role="tab" aria-selected="false">
+                                                <i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i> Ruta Crítica
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" id="tab-gantt" data-bs-toggle="tab"
+                                               href="#gantt" role="tab" aria-selected="false">
+                                                <i class="bi bi-bar-chart-steps me-1"></i> Gantt
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- ===== CONTENIDO DE TABS ===== -->
+                                    <div class="tab-content" id="pertTabsContent">
+
+                                        <!-- TAB 1: ACTIVIDADES -->
+                                        <div class="tab-pane fade show active" id="actividades" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-lg" id="tabla-actividades">
+                                                    <thead>
+                                                    <tr>
+                                                        <th style="width:80px;">ID</th>
+                                                        <th>Nombre de actividad</th>
+                                                        <th style="width:160px;">Duración (días)</th>
+                                                        <th>Predecesoras</th>
+                                                        <th>Descripción / Notas</th>
+                                                        <th style="width:160px;">Acciones</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="cuerpo-actividades"></tbody>
+                                                </table>
+                                                <div id="estado-vacio" class="text-center text-muted py-5" style="display:none;">
+                                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                                    No hay actividades registradas. ¡Agrega la primera!
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex gap-2 mt-3">
+                                                <button type="button" class="btn btn-agregar-fila" id="btn-agregar"
+                                                        onclick="pertAgregarFilaInline()">
+                                                    <i class="bi bi-plus-lg me-1"></i> Agregar actividad
+                                                </button>
+                                                <button type="button" class="btn btn-primary" id="btn-calcular"
+                                                        onclick="calcular()">
+                                                    <i class="bi bi-calculator-fill me-1"></i> Calcular
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary ms-auto" id="btn-ejemplo"
+                                                        onclick="pertCargarEjemplo()">
+                                                    <i class="bi bi-lightning-fill me-1"></i> Ver Ejemplo
+                                                </button>
+                                            </div>
+
+                                            <!-- Barra de progreso del cálculo -->
+                                            <div id="calc-progress-wrap" class="mt-3" style="display:none;">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span id="calc-progress-label" class="small text-muted">Calculando…</span>
+                                                    <span id="calc-progress-pct" class="small fw-bold" style="color:var(--guinda);">0%</span>
+                                                </div>
+                                                <div class="progress calc-progress-track">
+                                                    <div id="calc-progress-bar"
+                                                         class="progress-bar progress-bar-striped progress-bar-animated"
+                                                         role="progressbar" style="width:0%;"
+                                                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TAB 2: DIAGRAMA PERT -->
+                                        <div class="tab-pane fade" id="diagrama" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h4 class="mb-0">Red PERT</h4>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div class="diagrama-placeholder" id="area-diagrama-pert">
+                                                        <i class="bi bi-diagram-3"></i>
+                                                        <p class="mb-0 text-center">El diagrama se generará al calcular</p>
+                                                    </div>
+                                                    <!-- Barra de reproducción -->
+                                                    <div id="diag-pb-bar" class="d-none diag-pb-bar">
+                                                        <button class="diag-pb-btn" onclick="pertPlayGo(0)" title="Inicio">
+                                                            <i class="bi bi-skip-start-fill"></i>
+                                                        </button>
+                                                        <button class="diag-pb-btn" onclick="pertPlayStep(-1)" title="Anterior">
+                                                            <i class="bi bi-skip-backward-fill"></i>
+                                                        </button>
+                                                        <button class="diag-pb-btn diag-pb-main" id="diag-pb-play"
+                                                                onclick="pertPlayToggle()" title="Reproducir">
+                                                            <i class="bi bi-play-fill"></i>
+                                                        </button>
+                                                        <button class="diag-pb-btn" onclick="pertPlayStep(1)" title="Siguiente">
+                                                            <i class="bi bi-skip-forward-fill"></i>
+                                                        </button>
+                                                        <button class="diag-pb-btn" onclick="pertPlayGo(-1)" title="Final">
+                                                            <i class="bi bi-skip-end-fill"></i>
+                                                        </button>
+                                                        <input type="range" id="diag-pb-slider" class="diag-pb-slider"
+                                                               min="0" value="0" oninput="pertPlaySeek(+this.value)">
+                                                        <span id="diag-pb-label" class="diag-pb-label">—</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TAB 3: RUTA CRÍTICA -->
+                                        <div class="tab-pane fade" id="ruta" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-header d-flex align-items-center justify-content-between">
+                                                    <h4 class="mb-0">Análisis de Tiempos y Holguras</h4>
+                                                    <span class="badge bg-secondary">ES = Inicio Temprano &nbsp;·&nbsp; EF = Fin Temprano &nbsp;·&nbsp; LS = Inicio Tardío &nbsp;·&nbsp; LF = Fin Tardío</span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="rc-resumen"></div>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover table-lg" id="tabla-ruta">
+                                                            <thead class="table-light">
+                                                            <tr>
+                                                                <th>Actividad</th>
+                                                                <th class="text-center" title="Early Start">ES</th>
+                                                                <th class="text-center" title="Early Finish">EF</th>
+                                                                <th class="text-center" title="Late Start">LS</th>
+                                                                <th class="text-center" title="Late Finish">LF</th>
+                                                                <th class="text-center">Duración</th>
+                                                                <th class="text-center">Holgura</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody id="cuerpo-ruta">
+                                                            <tr>
+                                                                <td colspan="7" class="text-center text-muted py-4">
+                                                                    <i class="bi bi-info-circle me-2"></i>
+                                                                    Los resultados se mostrarán al calcular
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="rc-leyenda mt-2">
+                                                        <span class="rc-leyenda-item"><span class="rc-dot bg-danger"></span> Actividad crítica (Holgura = 0)</span>
+                                                        <span class="rc-leyenda-item"><span class="rc-dot bg-success"></span> Actividad no crítica</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TAB 4: GANTT -->
+                                        <div class="tab-pane fade" id="gantt" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-header d-flex align-items-center justify-content-between">
+                                                    <h4 class="mb-0">
+                                                        <i class="bi bi-bar-chart-steps me-2"></i>Diagrama de Gantt
+                                                    </h4>
+                                                    <span id="gantt-duracion-total"></span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="gantt-leyenda" class="d-none gantt-leyenda mb-3">
+                                                        <span class="gantt-leyenda-item">
+                                                            <span class="gantt-leg gantt-leg--crit"></span> Ruta crítica
+                                                        </span>
+                                                        <span class="gantt-leyenda-item">
+                                                            <span class="gantt-leg gantt-leg--norm"></span> No crítica
+                                                        </span>
+                                                        <span class="gantt-leyenda-item">
+                                                            <span class="gantt-leg gantt-leg--slack"></span> Holgura disponible
+                                                        </span>
+                                                    </div>
+                                                    <div class="diagrama-placeholder" id="area-gantt">
+                                                        <i class="bi bi-bar-chart-steps"></i>
+                                                        <p class="mb-0 text-center">El diagrama se generará al calcular</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div><!-- fin tab-content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- ── FIN MÓDULO PERT-CPM ── -->
+
+        </div><!-- fin main-content -->
+
+        <div class="footer">
+            <p><span class="footer-brand">Sistema de Optimización Matemática</span> &copy; 2026</p>
+            <p style="font-size:0.82rem; color:#aaa; margin-top:0.3rem;">IPN · UPIIZ · Métodos Cuantitativos para la Toma de Decisiones</p>
+        </div>
+
+    </div><!-- fin main-wrapper -->
+
+
+    <!-- Modal: Confirmar eliminación -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content border-0 shadow-lg overflow-hidden">
+                <div class="modal-eliminar-header">
+                    <div class="modal-eliminar-icon">
+                        <i class="bi bi-trash3-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">Eliminar actividad</h5>
+                        <p class="mb-0 opacity-75 small">Esta acción no se puede deshacer</p>
+                    </div>
+                </div>
+                <div class="modal-body px-4 py-3">
+                    <p class="mb-0 text-center" style="color:#444;">
+                        ¿Deseas eliminar la actividad
+                        <span id="modal-eliminar-id" class="badge bg-danger px-2 py-1 mx-1" style="font-size:.9rem;"></span>?
+                    </p>
+                    <p class="text-center text-muted small mt-1 mb-0" id="modal-eliminar-nombre"></p>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger px-4" id="btn-confirmar-eliminar"
+                            onclick="pertEjecutarEliminar()">
+                        <i class="bi bi-trash3-fill me-1"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script>
+/* ================================================================
+   pert-cpm.js  –  Lógica del módulo PERT-CPM
+   ================================================================ */
+
+/* ── Estado global ───────────────────────────────────────────── */
+var pertActividades = [];
+var pertEditandoId  = null;
+var pertTags        = [];
+var pertModalInst   = null;
+var pertFilaEdicion = null;
+var pertPredInline  = [];
+
+/* ── Utilidades ──────────────────────────────────────────────── */
+function pertEsc(str) {
+    return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function pertNotificar(msg, tipo) {
+    tipo = tipo || 'success';
+    var cfg = {
+        success: { bg: '#2d6a4f', icon: 'bi bi-check-circle-fill' },
+        danger:  { bg: '#a93226', icon: 'bi bi-trash3-fill' },
+        warning: { bg: '#b7770d', icon: 'bi bi-exclamation-triangle-fill' }
+    };
+    var c = cfg[tipo] || cfg.success;
+    var prev = document.getElementById('pert-notif-el');
+    if (prev) prev.remove();
+    var el = document.createElement('div');
+    el.id = 'pert-notif-el';
+    el.className = 'pert-notif';
+    el.style.background = c.bg;
+    el.innerHTML = '<div class="pert-notif-inner">' +
+        '<i class="' + c.icon + '"></i>' +
+        '<span>' + pertEsc(msg) + '</span>' +
+        '</div>';
+    document.body.appendChild(el);
+    setTimeout(function() { if (el.parentNode) el.remove(); }, 4100);
+}
+
+/* ── Render de tabla ─────────────────────────────────────────── */
+function pertRenderTabla() {
+    var tbody = document.getElementById('cuerpo-actividades');
+    var vacio = document.getElementById('estado-vacio');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (pertActividades.length === 0) {
+        if (vacio) vacio.style.display = 'block';
+        return;
+    }
+    if (vacio) vacio.style.display = 'none';
+    pertActividades.forEach(function(act) {
+        var predsHTML = act.predecesoras.length
+            ? act.predecesoras.map(function(p) {
+                return '<span class="badge bg-secondary me-1">' + pertEsc(p) + '</span>';
+            }).join('')
+            : '<span class="text-muted">—</span>';
+        var tr = document.createElement('tr');
+        tr.dataset.id = act.id;
+        tr.innerHTML =
+            '<td><span class="badge bg-primary">'  + pertEsc(act.id)     + '</span></td>' +
+            '<td>' + pertEsc(act.nombre)   + '</td>' +
+            '<td>' + act.duracion          + '</td>' +
+            '<td>' + predsHTML             + '</td>' +
+            '<td class="text-muted small">' + (pertEsc(act.notas) || '—') + '</td>' +
+            '<td>' +
+            '<div class="d-flex gap-1">' +
+            '<button class="btn btn-sm btn-warning text-white" onclick="editarActividad(\'' + pertEsc(act.id) + '\')">' +
+            '<i class="bi bi-pencil-fill"></i>' +
+            '</button>' +
+            '<button class="btn btn-sm btn-danger" onclick="eliminarActividad(\'' + pertEsc(act.id) + '\')">' +
+            '<i class="bi bi-trash-fill"></i>' +
+            '</button>' +
+            '</div>' +
+            '</td>';
+        tbody.appendChild(tr);
+    });
+}
+
+/* ── CRUD inline ─────────────────────────────────────────────── */
+function pertSugerirId() {
+    var letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (var i = 0; i < letras.length; i++) {
+        if (!pertActividades.find(function(a) { return a.id === letras[i]; })) return letras[i];
+    }
+    return '';
+}
+
+function pertBuildInlineRowHTML(mode, act) {
+    var idVal     = act ? act.id       : pertSugerirId();
+    var nombreVal = act ? act.nombre   : '';
+    var durVal    = act ? act.duracion : '';
+    var notasVal  = act ? (act.notas || '') : '';
+    var idCell = (mode === 'new')
+        ? '<input type="text" id="inline-id" class="form-control form-control-sm" placeholder="ID" maxlength="5" value="' + pertEsc(idVal) + '" onkeydown="pertInlineKeydown(event)" style="max-width:70px;">'
+        : '<span class="badge bg-primary px-2 py-1" style="font-size:.85rem;">' + pertEsc(idVal) + '</span>';
+    return '<td>' + idCell + '</td>' +
+        '<td><input type="text" id="inline-nombre" class="form-control form-control-sm" placeholder="Nombre de actividad" value="' + pertEsc(nombreVal) + '" onkeydown="pertInlineKeydown(event)"></td>' +
+        '<td><input type="number" id="inline-duracion" class="form-control form-control-sm" placeholder="1" min="0" step="0.5" value="' + pertEsc(String(durVal)) + '" onkeydown="pertInlineKeydown(event)" style="max-width:100px;"></td>' +
+        '<td>' +
+            '<div class="inline-pred-wrap">' +
+                '<div class="inline-pred-display" id="inline-pred-display" onclick="pertTogglePredDropdown(event)">' +
+                    '<span id="inline-pred-text"><span class="text-muted">—</span></span>' +
+                    '<i class="bi bi-chevron-down chevron"></i>' +
+                '</div>' +
+                '<div class="inline-pred-dropdown" id="inline-pred-dropdown"></div>' +
+            '</div>' +
+        '</td>' +
+        '<td><input type="text" id="inline-notas" class="form-control form-control-sm" placeholder="Descripción / Notas" value="' + pertEsc(notasVal) + '" onkeydown="pertInlineKeydown(event)"></td>' +
+        '<td>' +
+            '<div class="d-flex gap-2 align-items-center flex-nowrap">' +
+                '<button class="btn btn-sm btn-primary" onclick="pertConfirmarFila()" style="white-space:nowrap;">Confirmar</button>' +
+                '<button class="btn btn-sm btn-link text-muted p-0" onclick="pertCancelarFila()" style="white-space:nowrap;">Cancelar</button>' +
+            '</div>' +
+        '</td>';
+}
+
+function pertAgregarFilaInline() {
+    if (document.getElementById('fila-edicion-row')) {
+        var f = document.getElementById('inline-id') || document.getElementById('inline-nombre');
+        if (f) f.focus();
+        return;
+    }
+    pertFilaEdicion = 'new';
+    pertPredInline  = [];
+    var tbody = document.getElementById('cuerpo-actividades');
+    var vacio = document.getElementById('estado-vacio');
+    if (!tbody) return;
+    if (vacio) vacio.style.display = 'none';
+    var tr = document.createElement('tr');
+    tr.id        = 'fila-edicion-row';
+    tr.className = 'fila-edicion';
+    tr.innerHTML = pertBuildInlineRowHTML('new', null);
+    tbody.appendChild(tr);
+    pertRenderPredDropdown(pertActividades);
+    pertUpdatePredDisplay();
+    var first = document.getElementById('inline-id');
+    if (first) { first.focus(); first.select(); }
+    document.addEventListener('click', pertCloseDropdownOutside);
+    window.addEventListener('scroll', pertClosePredOnScroll, true);
+}
+
+function editarActividad(id) {
+    if (pertFilaEdicion) pertCancelarFila();
+    var act = pertActividades.find(function(a) { return a.id === id; });
+    if (!act) return;
+    pertFilaEdicion = id;
+    pertPredInline  = act.predecesoras.slice();
+    var tr = document.querySelector('#cuerpo-actividades tr[data-id="' + id + '"]');
+    if (!tr) return;
+    tr.id        = 'fila-edicion-row';
+    tr.className = 'fila-edicion';
+    tr.innerHTML = pertBuildInlineRowHTML('edit', act);
+    var available = pertActividades.filter(function(a) { return a.id !== id; });
+    pertRenderPredDropdown(available);
+    pertUpdatePredDisplay();
+    var n = document.getElementById('inline-nombre');
+    if (n) { n.focus(); n.select(); }
+    document.addEventListener('click', pertCloseDropdownOutside);
+    window.addEventListener('scroll', pertClosePredOnScroll, true);
+}
+
+function pertConfirmarFila() {
+    var nombreEl   = document.getElementById('inline-nombre');
+    var duracionEl = document.getElementById('inline-duracion');
+    var notasEl    = document.getElementById('inline-notas');
+    var nombre   = nombreEl   ? nombreEl.value.trim()         : '';
+    var duracion = duracionEl ? parseFloat(duracionEl.value)  : NaN;
+    var notas    = notasEl    ? notasEl.value.trim()          : '';
+    if (!nombre)                         return pertNotificar('El nombre de actividad es obligatorio.', 'danger');
+    if (isNaN(duracion) || duracion < 0) return pertNotificar('La duración debe ser un número ≥ 0.', 'danger');
+    if (pertFilaEdicion === 'new') {
+        var idEl = document.getElementById('inline-id');
+        var id   = idEl ? idEl.value.trim().toUpperCase() : '';
+        if (!id) return pertNotificar('El ID / Clave es obligatorio.', 'danger');
+        if (pertActividades.find(function(a) { return a.id === id; }))
+            return pertNotificar('Ya existe una actividad con ID "' + id + '".', 'warning');
+        pertActividades.push({ id: id, nombre: nombre, duracion: duracion, predecesoras: pertPredInline.slice(), notas: notas });
+        pertCancelarFila();
+        pertRenderTabla();
+        pertNotificar('Actividad "' + id + '" agregada correctamente.');
+    } else {
+        var id = pertFilaEdicion;
+        var act = pertActividades.find(function(a) { return a.id === id; });
+        if (act) { act.nombre = nombre; act.duracion = duracion; act.predecesoras = pertPredInline.slice(); act.notas = notas; }
+        pertFilaEdicion = null; pertPredInline = [];
+        document.removeEventListener('click', pertCloseDropdownOutside);
+        window.removeEventListener('scroll', pertClosePredOnScroll, true);
+        var row = document.getElementById('fila-edicion-row');
+        if (row) { row.id = ''; row.className = ''; }
+        pertRenderTabla();
+        pertNotificar('Actividad "' + id + '" actualizada correctamente.');
+    }
+}
+
+function pertCancelarFila() {
+    pertFilaEdicion = null; pertPredInline = [];
+    document.removeEventListener('click', pertCloseDropdownOutside);
+    window.removeEventListener('scroll', pertClosePredOnScroll, true);
+    var row = document.getElementById('fila-edicion-row');
+    if (row) row.remove();
+    pertRenderTabla();
+}
+
+function pertInlineKeydown(e) {
+    if (e.key === 'Enter')  { e.preventDefault(); pertConfirmarFila(); }
+    if (e.key === 'Escape') { e.preventDefault(); pertCancelarFila(); }
+}
+
+/* ── Dropdown predecesoras ───────────────────────────────────── */
+function pertRenderPredDropdown(available) {
+    var dropdown = document.getElementById('inline-pred-dropdown');
+    if (!dropdown) return;
+    if (!available || available.length === 0) {
+        dropdown.innerHTML = '<div class="inline-pred-empty">Sin actividades disponibles</div>';
+        return;
+    }
+    dropdown.innerHTML = available.map(function(act) {
+        var checked = pertPredInline.indexOf(act.id) !== -1 ? 'checked' : '';
+        return '<label class="inline-pred-option">' +
+            '<input type="checkbox" value="' + pertEsc(act.id) + '" ' + checked + ' onchange="pertTogglePred(this)" onclick="event.stopPropagation()">' +
+            '<span class="badge bg-secondary me-1" style="font-size:.75rem;">' + pertEsc(act.id) + '</span>' +
+            '<span>' + pertEsc(act.nombre) + '</span>' +
+        '</label>';
+    }).join('');
+}
+
+function pertTogglePred(checkbox) {
+    var val = checkbox.value;
+    if (checkbox.checked) { if (pertPredInline.indexOf(val) === -1) pertPredInline.push(val); }
+    else { pertPredInline = pertPredInline.filter(function(p) { return p !== val; }); }
+    pertUpdatePredDisplay();
+}
+
+function pertUpdatePredDisplay() {
+    var span = document.getElementById('inline-pred-text');
+    if (!span) return;
+    if (pertPredInline.length === 0) {
+        span.innerHTML = '<span class="text-muted">—</span>';
+    } else {
+        span.innerHTML = pertPredInline.map(function(p) {
+            return '<span class="badge bg-primary me-1" style="font-size:.75rem;">' + pertEsc(p) + '</span>';
+        }).join('');
+    }
+}
+
+function pertTogglePredDropdown(e) {
+    e.stopPropagation();
+    var dropdown = document.getElementById('inline-pred-dropdown');
+    var display  = document.getElementById('inline-pred-display');
+    if (!dropdown || !display) return;
+    var isOpen = dropdown.classList.contains('open');
+    if (isOpen) { dropdown.classList.remove('open'); }
+    else {
+        var rect = display.getBoundingClientRect();
+        dropdown.style.top   = (rect.bottom + 2) + 'px';
+        dropdown.style.left  = rect.left + 'px';
+        dropdown.style.width = Math.max(rect.width, 200) + 'px';
+        dropdown.classList.add('open');
+    }
+}
+
+function pertCloseDropdownOutside(e) {
+    var wrap = document.getElementById('inline-pred-display');
+    var drop = document.getElementById('inline-pred-dropdown');
+    if (!wrap || !drop) return;
+    if (!wrap.contains(e.target) && !drop.contains(e.target)) drop.classList.remove('open');
+}
+
+function pertClosePredOnScroll(e) {
+    var drop = document.getElementById('inline-pred-dropdown');
+    if (!drop) return;
+    if (drop.contains(e.target)) return;
+    drop.classList.remove('open');
+}
+
+/* ── Eliminar ────────────────────────────────────────────────── */
+var pertIdAEliminar = null;
+
+function eliminarActividad(id) {
+    var act = pertActividades.find(function(a) { return a.id === id; });
+    if (!act) return;
+    pertIdAEliminar = id;
+    var badgeEl  = document.getElementById('modal-eliminar-id');
+    var nombreEl = document.getElementById('modal-eliminar-nombre');
+    if (badgeEl)  badgeEl.textContent  = id;
+    if (nombreEl) nombreEl.textContent = act.nombre || '';
+    var el = document.getElementById('modalEliminar');
+    if (el && window.bootstrap && window.bootstrap.Modal) new window.bootstrap.Modal(el).show();
+}
+
+function pertEjecutarEliminar() {
+    var id = pertIdAEliminar;
+    if (!id) return;
+    pertIdAEliminar = null;
+    var el = document.getElementById('modalEliminar');
+    if (el && window.bootstrap && window.bootstrap.Modal) window.bootstrap.Modal.getInstance(el).hide();
+    pertActividades = pertActividades.filter(function(a) { return a.id !== id; });
+    pertActividades.forEach(function(a) { a.predecesoras = a.predecesoras.filter(function(p) { return p !== id; }); });
+    pertRenderTabla();
+    pertNotificar('Actividad "' + id + '" eliminada.', 'danger');
+}
+
+/* ── Progress bar ────────────────────────────────────────────── */
+function pertMostrarProgreso(pct, label) {
+    var wrap  = document.getElementById('calc-progress-wrap');
+    var bar   = document.getElementById('calc-progress-bar');
+    var lbl   = document.getElementById('calc-progress-label');
+    var pctEl = document.getElementById('calc-progress-pct');
+    if (!wrap) return;
+    wrap.style.display = 'block';
+    if (bar)   { bar.style.width = pct + '%'; bar.setAttribute('aria-valuenow', pct); }
+    if (lbl)   lbl.textContent = label;
+    if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function pertOcultarProgreso(cb) {
+    var wrap = document.getElementById('calc-progress-wrap');
+    if (!wrap) { cb && cb(); return; }
+    setTimeout(function() { wrap.style.display = 'none'; cb && cb(); }, 350);
+}
+
+function calcular() {
+    if (pertActividades.length === 0)
+        return pertNotificar('No hay actividades para calcular.', 'warning');
+    var pasos = [
+        { pct:  8, label: 'Iniciando cálculo PERT-CPM…',      fn: null },
+        { pct: 25, label: 'Ordenamiento topológico…',          fn: null },
+        { pct: 50, label: 'Forward pass (tiempos tempranos)…', fn: null },
+        { pct: 72, label: 'Backward pass (tiempos tardíos)…',  fn: null },
+        { pct: 84, label: 'Generando diagrama de red…',        fn: pertDibujarDiagrama },
+        { pct: 92, label: 'Calculando ruta crítica…',          fn: pertRenderRutaCritica },
+        { pct: 97, label: 'Generando diagrama Gantt…',         fn: pertDibujarGantt },
+        { pct: 100, label: '¡Cálculo completado!',             fn: null }
+    ];
+    var i = 0;
+    function paso() {
+        if (i >= pasos.length) {
+            pertOcultarProgreso(function() {
+                var tabEl = document.getElementById('tab-diagrama');
+                if (tabEl) {
+                    if (window.bootstrap && window.bootstrap.Tab) new window.bootstrap.Tab(tabEl).show();
+                    else tabEl.click();
+                }
+                pertNotificar('Cálculo PERT-CPM completado.');
+            });
+            return;
+        }
+        var p = pasos[i++];
+        pertMostrarProgreso(p.pct, p.label);
+        if (p.fn) p.fn();
+        setTimeout(paso, p.fn ? 60 : 40);
+    }
+    paso();
+}
+
+/* ── Ejemplo precargado ──────────────────────────────────────── */
+function pertCargarEjemplo() {
+    if (pertActividades.length > 0 && !confirm('¿Reemplazar las actividades actuales con el ejemplo?')) return;
+    if (pertFilaEdicion) pertCancelarFila();
+    pertActividades = [
+        { id:'A', nombre:'Excavación',        duracion:2,  predecesoras:[],        notas:'' },
+        { id:'B', nombre:'Cimentación',       duracion:4,  predecesoras:['A'],     notas:'' },
+        { id:'C', nombre:'Paredes',           duracion:10, predecesoras:['B'],     notas:'' },
+        { id:'D', nombre:'Techo',             duracion:6,  predecesoras:['C'],     notas:'' },
+        { id:'E', nombre:'Revestimiento Ext.',duracion:4,  predecesoras:['C'],     notas:'' },
+        { id:'F', nombre:'Revestimiento Int.',duracion:5,  predecesoras:['E'],     notas:'' },
+        { id:'G', nombre:'Muros',             duracion:7,  predecesoras:['D'],     notas:'' },
+        { id:'H', nombre:'Pintura Ext.',      duracion:9,  predecesoras:['E','G'], notas:'' },
+        { id:'I', nombre:'Inst. Eléctrica',   duracion:7,  predecesoras:['C'],     notas:'' },
+        { id:'J', nombre:'Divisiones',        duracion:8,  predecesoras:['F','I'], notas:'' },
+        { id:'K', nombre:'Piso',              duracion:4,  predecesoras:['J'],     notas:'' },
+        { id:'L', nombre:'Pintura Int.',      duracion:5,  predecesoras:['J'],     notas:'' },
+        { id:'M', nombre:'Acabado Ext.',      duracion:2,  predecesoras:['H'],     notas:'' },
+        { id:'N', nombre:'Acabado Int.',      duracion:6,  predecesoras:['K','L'], notas:'' }
+    ];
+    pertRenderTabla();
+    pertNotificar('Ejemplo cargado — 14 actividades de construcción.');
+}
+
+/* ── Init ────────────────────────────────────────────────────── */
+function pertInit() {
+    pertModalInst = null;
+    pertFilaEdicion = null;
+    pertPredInline  = [];
+    document.removeEventListener('click', pertCloseDropdownOutside);
+    window.removeEventListener('scroll', pertClosePredOnScroll, true);
+    pertPlayStopTimer();
+    _pbSteps = []; _pbCurrent = null; _cpmData = null;
+    _pdVP = { x: 0, y: 0, s: 1 }; _pdDrag = false;
+    pertRenderTabla();
+}
+
+/* ================================================================
+    Cálculo CPM
+================================================================ */
+function pertCalcularCPM() {
+    if (pertActividades.length === 0) return null;
+    var orden = [], vis = {};
+    function topo(id) {
+        if (vis[id]) return; vis[id] = true;
+        var a = pertActividades.find(function(x){ return x.id===id; });
+        if (a) a.predecesoras.forEach(function(p){ topo(p); });
+        orden.push(id);
+    }
+    pertActividades.forEach(function(a){ topo(a.id); });
+    var ES={}, EF={};
+    orden.forEach(function(id){
+        var a = pertActividades.find(function(x){ return x.id===id; });
+        var e=0; a.predecesoras.forEach(function(p){ if(EF[p]>e) e=EF[p]; });
+        ES[id]=e; EF[id]=e+a.duracion;
+    });
+    var T = Math.max.apply(null, orden.map(function(id){ return EF[id]; }));
+    var LS={}, LF={};
+    orden.slice().reverse().forEach(function(id){
+        var a = pertActividades.find(function(x){ return x.id===id; });
+        var sucs = pertActividades.filter(function(b){ return b.predecesoras.indexOf(id)!==-1; });
+        LF[id] = sucs.length===0 ? T : Math.min.apply(null, sucs.map(function(b){ return LS[b.id]; }));
+        LS[id] = LF[id] - a.duracion;
+    });
+    return { orden:orden, ES:ES, EF:EF, LS:LS, LF:LF, T:T };
+}
+
+/* ================================================================
+    Diagrama PERT-CPM  –  Viewport pan/zoom + Playback
+================================================================ */
+var _pdVP   = { x: 0, y: 0, s: 1 };
+var _pdNW   = 0, _pdNH = 0;
+var _pdDrag = false, _pdDX = 0, _pdDY = 0, _pdTX = 0, _pdTY = 0;
+var _pbSteps   = [];
+var _pbCurrent = null;
+var _pbTimer   = null;
+var _cpmData   = null;
+
+function _pSafe(id) { return String(id).replace(/[^a-zA-Z0-9]/g, '_'); }
+
+function pertDibujarDiagrama() {
+    var cont = document.getElementById('area-diagrama-pert');
+    if (!cont) return;
+    if (pertActividades.length === 0) {
+        cont.className = 'diagrama-placeholder';
+        cont.style.cssText = '';
+        cont.innerHTML = '<i class="bi bi-diagram-3"></i><p class="mb-0 text-center">El diagrama se generará al calcular</p>';
+        var pb0 = document.getElementById('diag-pb-bar');
+        if (pb0) pb0.classList.add('d-none');
+        return;
+    }
+    var cpm = pertCalcularCPM();
+    if (!cpm) return;
+    var ES = cpm.ES, EF = cpm.EF, LS = cpm.LS, LF = cpm.LF;
+
+    var col = {};
+    pertActividades.forEach(function(a) { if (a.predecesoras.length === 0) col[a.id] = 0; });
+    var guard = pertActividades.length * 2;
+    while (guard-- > 0) {
+        pertActividades.forEach(function(a) {
+            if (col[a.id] !== undefined) return;
+            var ready = a.predecesoras.every(function(p) { return col[p] !== undefined; });
+            if (ready) col[a.id] = a.predecesoras.length === 0 ? 0 :
+                1 + Math.max.apply(null, a.predecesoras.map(function(p) { return col[p] | 0; }));
+        });
+    }
+    pertActividades.forEach(function(a) { if (col[a.id] === undefined) col[a.id] = 0; });
+
+    var maxCol = 0;
+    pertActividades.forEach(function(a) { if (col[a.id] > maxCol) maxCol = col[a.id]; });
+    var byCol = [];
+    for (var ci = 0; ci <= maxCol; ci++) byCol[ci] = [];
+    pertActividades.forEach(function(a) { byCol[col[a.id]].push(a); });
+    byCol.forEach(function(g) { g.sort(function(a, b) { return ES[a.id] - ES[b.id]; }); });
+
+    var NW = 96, NH = 68, S1 = 20, S2 = 28;
+    var COL_W = NW + 80, ROW_H = NH + 48, PAD = 28;
+    var maxRows = 0;
+    byCol.forEach(function(g) { if (g.length > maxRows) maxRows = g.length; });
+    var SVG_W = PAD * 2 + (maxCol + 1) * COL_W - (COL_W - NW);
+    var SVG_H = PAD * 2 + maxRows * ROW_H - (ROW_H - NH) + 20;
+
+    var pos = {};
+    byCol.forEach(function(group, ci) {
+        var occupied = (group.length - 1) * ROW_H + NH;
+        var startY = (SVG_H - occupied) / 2 + NH / 2;
+        group.forEach(function(a, ri) {
+            pos[a.id] = { cx: PAD + NW / 2 + ci * COL_W, cy: startY + ri * ROW_H };
+        });
+    });
+
+    var criticas = {};
+    pertActividades.forEach(function(a) {
+        if (+(LS[a.id] - ES[a.id]).toFixed(2) === 0) criticas[a.id] = true;
+    });
+
+    var topoOrder = [];
+    for (var tc = 0; tc <= maxCol; tc++) byCol[tc].forEach(function(a) { topoOrder.push(a.id); });
+    var revOrder = topoOrder.slice().reverse();
+    _cpmData = { ES: ES, EF: EF, LS: LS, LF: LF, T: cpm.T, topoOrder: topoOrder, revOrder: revOrder, criticas: criticas };
+    _pbSteps = [];
+    topoOrder.forEach(function(id) { _pbSteps.push({ type: 'fwd-es', id: id }); _pbSteps.push({ type: 'fwd-ef', id: id }); });
+    revOrder.forEach(function(id)  { _pbSteps.push({ type: 'bwd-lf', id: id }); _pbSteps.push({ type: 'bwd-ls', id: id }); });
+    topoOrder.forEach(function(id) { _pbSteps.push({ type: 'slack',  id: id }); });
+
+    var defs = '<defs>';
+    var edgesSVG = '', nodesSVG = '';
+
+    pertActividades.forEach(function(a) {
+        a.predecesoras.forEach(function(predId) {
+            var src = pos[predId], dst = pos[a.id];
+            if (!src || !dst) return;
+            var mid  = 'm' + _pSafe(predId) + '_' + _pSafe(a.id);
+            var eid  = 'pep-' + _pSafe(predId) + '_' + _pSafe(a.id);
+            var amid = 'pea-' + _pSafe(predId) + '_' + _pSafe(a.id);
+            var x1 = src.cx + NW / 2, y1 = src.cy;
+            var x2 = dst.cx - NW / 2 - 1, y2 = dst.cy;
+            var dx = (x2 - x1) * 0.42;
+            var path = 'M' + x1.toFixed(1) + ',' + y1.toFixed(1) +
+                ' C' + (x1+dx).toFixed(1) + ',' + y1.toFixed(1) +
+                ' '  + (x2-dx).toFixed(1) + ',' + y2.toFixed(1) +
+                ' '  + x2.toFixed(1) + ',' + y2.toFixed(1);
+            defs += '<marker id="' + mid + '" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">' +
+                '<polygon id="' + amid + '" points="0 0,8 3,0 6" fill="#aaa"/></marker>';
+            edgesSVG += '<g class="pert-e" data-from="' + pertEsc(predId) + '" data-to="' + pertEsc(a.id) + '"' +
+                ' style="transition:opacity .25s;">' +
+                '<path id="' + eid + '" d="' + path + '" fill="none" stroke="#aaa"' +
+                ' stroke-width="1.6" marker-end="url(#' + mid + ')"/></g>';
+        });
+    });
+    defs += '</defs>';
+
+    pertActividades.forEach(function(a) {
+        var p = pos[a.id]; if (!p) return;
+        var x = p.cx - NW / 2, y = p.cy - NH / 2;
+        var safe   = _pSafe(a.id);
+        var idFont = a.id.length <= 2 ? 22 : a.id.length <= 4 ? 15 : 11;
+        var yd1 = y + S1, yd2 = y + S1 + S2;
+        var tyTop = y + S1/2 + 4, tyBot = yd2 + S1/2 + 4;
+        var n = '';
+        n += '<rect x="'+(x+3)+'" y="'+(y+3)+'" width="'+NW+'" height="'+NH+'" rx="5" fill="rgba(0,0,0,0.09)"/>';
+        n += '<rect x="'+x+'" y="'+y+'" width="'+NW+'" height="'+S1+'" rx="5" fill="#dbeeff"/>';
+        n += '<rect x="'+x+'" y="'+(y+S1-6)+'" width="'+NW+'" height="6" fill="#dbeeff"/>';
+        n += '<rect id="pnm-'+safe+'" x="'+x+'" y="'+yd1+'" width="'+NW+'" height="'+S2+'" fill="#fff"/>';
+        n += '<rect x="'+x+'" y="'+yd2+'" width="'+NW+'" height="'+S1+'" rx="5" fill="#fef9e7"/>';
+        n += '<rect x="'+x+'" y="'+yd2+'" width="'+NW+'" height="6" fill="#fef9e7"/>';
+        n += '<rect id="pnr-'+safe+'" x="'+x+'" y="'+y+'" width="'+NW+'" height="'+NH+'" rx="5" fill="none" stroke="#7B1034" stroke-width="2"/>';
+        n += '<line x1="'+x+'" y1="'+yd1+'" x2="'+(x+NW)+'" y2="'+yd1+'" stroke="#7B1034" stroke-width="0.8" opacity="0.5"/>';
+        n += '<line x1="'+x+'" y1="'+yd2+'" x2="'+(x+NW)+'" y2="'+yd2+'" stroke="#7B1034" stroke-width="0.8" opacity="0.5"/>';
+        n += '<line x1="'+p.cx+'" y1="'+y+'" x2="'+p.cx+'" y2="'+yd1+'" stroke="#7B1034" stroke-width="0.8" opacity="0.35"/>';
+        n += '<line x1="'+p.cx+'" y1="'+yd2+'" x2="'+p.cx+'" y2="'+(y+NH)+'" stroke="#7B1034" stroke-width="0.8" opacity="0.35"/>';
+        n += '<text id="pnt-'+safe+'-es" x="'+(x+NW/4)+'" y="'+tyTop+'" text-anchor="middle" font-size="10" font-weight="bold" fill="#1565c0" font-family="sans-serif">'+ES[a.id]+'</text>';
+        n += '<text id="pnt-'+safe+'-ef" x="'+(x+3*NW/4)+'" y="'+tyTop+'" text-anchor="middle" font-size="10" font-weight="bold" fill="#1565c0" font-family="sans-serif">'+EF[a.id]+'</text>';
+        n += '<text id="pni-'+safe+'" x="'+p.cx+'" y="'+p.cy+'" text-anchor="middle" dominant-baseline="middle" font-size="'+idFont+'" font-weight="bold" fill="#7B1034" font-family="sans-serif">'+pertEsc(a.id)+'</text>';
+        n += '<text id="pnt-'+safe+'-ls" x="'+(x+NW/4)+'" y="'+tyBot+'" text-anchor="middle" font-size="10" font-weight="bold" fill="#b71c1c" font-family="sans-serif">'+LS[a.id]+'</text>';
+        n += '<text id="pnt-'+safe+'-lf" x="'+(x+3*NW/4)+'" y="'+tyBot+'" text-anchor="middle" font-size="10" font-weight="bold" fill="#b71c1c" font-family="sans-serif">'+LF[a.id]+'</text>';
+        n += '<text x="'+p.cx+'" y="'+(y+NH+13)+'" text-anchor="middle" font-size="9" fill="#888" font-family="sans-serif">'+a.duracion+' días</text>';
+        nodesSVG += '<g id="pn-'+safe+'" class="pert-n" style="transition:opacity .25s,filter .25s;">'+n+'</g>';
+    });
+
+    _pdNW = SVG_W; _pdNH = SVG_H + 10;
+    _pdVP = { x: 0, y: 0, s: 1 };
+    _pbCurrent = null;
+    pertPlayStopTimer();
+
+    cont.className = '';
+    cont.style.cssText = 'position:relative;height:480px;overflow:hidden;background:#f8f9fc;border-radius:8px 8px 0 0;';
+    cont.innerHTML =
+        '<div id="diag-zoom-panel" class="diag-zoom-panel">' +
+            '<button class="diag-zoom-btn" onclick="pertZoomIn()" title="Acercar"><i class="bi bi-plus-lg"></i></button>' +
+            '<button class="diag-zoom-btn" onclick="pertZoomOut()" title="Alejar"><i class="bi bi-dash-lg"></i></button>' +
+            '<div class="diag-zoom-sep"></div>' +
+            '<button class="diag-zoom-btn" onclick="pertFitView()" title="Ajustar vista"><i class="bi bi-fullscreen"></i></button>' +
+            '<button class="diag-zoom-btn" onclick="pertDownloadDiag()" title="Descargar SVG"><i class="bi bi-download"></i></button>' +
+        '</div>' +
+        '<svg id="pert-svg-c" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="display:block;cursor:grab;">' +
+        defs + '<g id="pert-vp">' + edgesSVG + nodesSVG + '</g></svg>';
+
+    pertInitDiagEvents();
+    setTimeout(pertFitView, 60);
+
+    var pb = document.getElementById('diag-pb-bar');
+    if (pb) {
+        pb.classList.remove('d-none');
+        var slider = document.getElementById('diag-pb-slider');
+        if (slider) { slider.max = _pbSteps.length - 1; slider.value = _pbSteps.length - 1; }
+        var label = document.getElementById('diag-pb-label');
+        if (label) label.textContent = _pbSteps.length + ' / ' + _pbSteps.length + ' · Completo';
+    }
+}
+
+/* ── Viewport ────────────────────────────────────────────────── */
+function _pertApplyVP() {
+    var vp = document.getElementById('pert-vp');
+    if (vp) vp.setAttribute('transform',
+        'translate('+_pdVP.x.toFixed(1)+','+_pdVP.y.toFixed(1)+') scale('+_pdVP.s.toFixed(3)+')');
+}
+
+function pertInitDiagEvents() {
+    var svg = document.getElementById('pert-svg-c');
+    if (!svg || svg._dInit) return;
+    svg._dInit = true;
+    svg.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        var r = svg.getBoundingClientRect();
+        var mx = e.clientX - r.left, my = e.clientY - r.top;
+        var f = e.deltaY < 0 ? 1.12 : 0.893;
+        _pdVP.x = mx + f * (_pdVP.x - mx);
+        _pdVP.y = my + f * (_pdVP.y - my);
+        _pdVP.s = Math.min(4, Math.max(0.1, _pdVP.s * f));
+        _pertApplyVP();
+    }, { passive: false });
+    svg.addEventListener('mousedown', function(e) {
+        if (e.button !== 0) return;
+        _pdDrag = true; _pdDX = e.clientX; _pdDY = e.clientY;
+        _pdTX = _pdVP.x; _pdTY = _pdVP.y;
+        svg.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!_pdDrag) return;
+        _pdVP.x = _pdTX + (e.clientX - _pdDX);
+        _pdVP.y = _pdTY + (e.clientY - _pdDY);
+        _pertApplyVP();
+    });
+    document.addEventListener('mouseup', function() {
+        if (!_pdDrag) return;
+        _pdDrag = false;
+        var s = document.getElementById('pert-svg-c');
+        if (s) s.style.cursor = 'grab';
+    });
+}
+
+function pertZoomIn()  { _pertZoomBy(1.2);  }
+function pertZoomOut() { _pertZoomBy(0.833); }
+function _pertZoomBy(f) {
+    var c = document.getElementById('pert-svg-c');
+    if (!c) return;
+    var r = c.getBoundingClientRect();
+    var mx = r.width / 2, my = r.height / 2;
+    _pdVP.x = mx + f * (_pdVP.x - mx);
+    _pdVP.y = my + f * (_pdVP.y - my);
+    _pdVP.s = Math.min(4, Math.max(0.1, _pdVP.s * f));
+    _pertApplyVP();
+}
+
+function pertFitView() {
+    var c = document.getElementById('pert-svg-c');
+    if (!c || !_pdNW) return;
+    var cw = c.clientWidth, ch = c.clientHeight, pad = 32;
+    var s = Math.min((cw - pad*2) / _pdNW, (ch - pad*2) / _pdNH);
+    _pdVP.s = s; _pdVP.x = (cw - _pdNW*s)/2; _pdVP.y = (ch - _pdNH*s)/2;
+    _pertApplyVP();
+}
+
+function pertDownloadDiag() {
+    var svg = document.getElementById('pert-svg-c');
+    if (!svg) return;
+    var clone = svg.cloneNode(true);
+    clone.setAttribute('width', _pdNW);
+    clone.setAttribute('height', _pdNH);
+    var vp = clone.querySelector('#pert-vp');
+    if (vp) vp.setAttribute('transform', 'translate(0,0) scale(1)');
+    clone.querySelectorAll('.pert-n,.pert-e').forEach(function(el) { el.style.opacity = '1'; el.style.filter = ''; });
+    if (_cpmData) {
+        _cpmData.topoOrder.forEach(function(id) {
+            var safe = _pSafe(id);
+            var fields = { es: _cpmData.ES[id], ef: _cpmData.EF[id], ls: _cpmData.LS[id], lf: _cpmData.LF[id] };
+            Object.keys(fields).forEach(function(f) {
+                var t = clone.querySelector('#pnt-' + safe + '-' + f);
+                if (t) t.textContent = String(fields[f]);
+            });
+            var isCrit  = !!_cpmData.criticas[id];
+            var rBorder = clone.querySelector('#pnr-' + safe);
+            var rFill   = clone.querySelector('#pnm-' + safe);
+            var tId     = clone.querySelector('#pni-' + safe);
+            if (rBorder) { rBorder.setAttribute('stroke', isCrit ? '#1565c0' : '#7B1034'); rBorder.setAttribute('stroke-width', isCrit ? '3.5' : '2'); }
+            if (rFill)   rFill.setAttribute('fill', isCrit ? '#e3f2fd' : '#fff');
+            if (tId)     tId.setAttribute('fill', isCrit ? '#0d47a1' : '#7B1034');
+        });
+        pertActividades.forEach(function(a) {
+            a.predecesoras.forEach(function(p) {
+                var isCrit = !!(_cpmData.criticas[p] && _cpmData.criticas[a.id]);
+                var key  = _pSafe(p) + '_' + _pSafe(a.id);
+                var path = clone.querySelector('#pep-' + key);
+                var arr  = clone.querySelector('#pea-' + key);
+                if (path) { path.setAttribute('stroke', isCrit ? '#1565c0' : '#aaa'); path.setAttribute('stroke-width', isCrit ? '3' : '1.6'); }
+                if (arr)  arr.setAttribute('fill', isCrit ? '#1565c0' : '#aaa');
+            });
+        });
+    }
+    var str = new XMLSerializer().serializeToString(clone);
+    var blob = new Blob([str], { type: 'image/svg+xml' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'pert-diagrama.svg'; a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
+/* ── Playback ────────────────────────────────────────────────── */
+function _pertSetNodeVal(id, field, val) {
+    var el = document.getElementById('pnt-' + _pSafe(id) + '-' + field);
+    if (el) el.textContent = String(val);
+}
+
+function _pertNodeMark(id, isCrit) {
+    var safe    = _pSafe(id);
+    var rBorder = document.getElementById('pnr-' + safe);
+    var rFill   = document.getElementById('pnm-' + safe);
+    var tId     = document.getElementById('pni-' + safe);
+    if (rBorder) { rBorder.setAttribute('stroke', isCrit ? '#1565c0' : '#7B1034'); rBorder.setAttribute('stroke-width', isCrit ? '3.5' : '2'); }
+    if (rFill)   rFill.setAttribute('fill', isCrit ? '#e3f2fd' : '#fff');
+    if (tId)     tId.setAttribute('fill', isCrit ? '#0d47a1' : '#7B1034');
+}
+
+function _pertEdgeMark(from, to, isCrit) {
+    var key  = _pSafe(from) + '_' + _pSafe(to);
+    var path = document.getElementById('pep-' + key);
+    var arr  = document.getElementById('pea-' + key);
+    var col  = isCrit ? '#1565c0' : '#aaa';
+    var sw   = isCrit ? '3' : '1.6';
+    if (path) { path.setAttribute('stroke', col); path.setAttribute('stroke-width', sw); }
+    if (arr)  arr.setAttribute('fill', col);
+}
+
+function _pertResetAllMarks(cpm) {
+    if (!cpm) return;
+    cpm.topoOrder.forEach(function(id) { _pertNodeMark(id, false); });
+    pertActividades.forEach(function(a) {
+        a.predecesoras.forEach(function(p) { _pertEdgeMark(p, a.id, false); });
+    });
+}
+
+function pertPlaySetStep(n) {
+    _pbCurrent = n;
+    var total = _pbSteps.length;
+    var atEnd = (n === null || n >= total - 1);
+    var slider = document.getElementById('diag-pb-slider');
+    var label  = document.getElementById('diag-pb-label');
+    if (slider) slider.value = atEnd ? total - 1 : n;
+    var cpm = _cpmData;
+    if (!cpm) return;
+
+    if (atEnd) {
+        cpm.topoOrder.forEach(function(id) {
+            _pertSetNodeVal(id, 'es', cpm.ES[id]);
+            _pertSetNodeVal(id, 'ef', cpm.EF[id]);
+            _pertSetNodeVal(id, 'ls', cpm.LS[id]);
+            _pertSetNodeVal(id, 'lf', cpm.LF[id]);
+            _pertNodeMark(id, !!cpm.criticas[id]);
+        });
+        pertActividades.forEach(function(a) {
+            a.predecesoras.forEach(function(p) {
+                _pertEdgeMark(p, a.id, !!(cpm.criticas[p] && cpm.criticas[a.id]));
+            });
+        });
+        cpm.topoOrder.forEach(function(id) {
+            var el = document.getElementById('pn-' + _pSafe(id));
+            if (!el) return;
+            el.style.opacity = '1';
+            el.style.filter  = cpm.criticas[id] ? 'drop-shadow(0 0 10px rgba(21,101,192,.75))' : '';
+        });
+        document.querySelectorAll('.pert-e').forEach(function(el) { el.style.opacity='1'; });
+        if (label) label.textContent = total + ' / ' + total + ' · Completo';
+        return;
+    }
+
+    _pertResetAllMarks(cpm);
+
+    var step     = _pbSteps[n];
+    var activeId = step.id;
+    var act      = activeId ? pertActividades.find(function(a) { return a.id === activeId; }) : null;
+    var actName  = act ? act.nombre : '';
+
+    if (label) {
+        var fieldTag = step.type === 'fwd-es' ? 'ES' :
+                       step.type === 'fwd-ef' ? 'EF' :
+                       step.type === 'bwd-lf' ? 'LF' :
+                       step.type === 'bwd-ls' ? 'LS' : 'Holgura';
+        var arrow = step.type.startsWith('fwd') ? '→' :
+                    step.type.startsWith('bwd') ? '←' : '◆';
+        label.textContent = (n + 1) + ' / ' + total + '  ' + arrow + '  ' + fieldTag + ' · ' + actName;
+    }
+
+    /* PASE DIRECTO */
+    if (step.type === 'fwd-es' || step.type === 'fwd-ef') {
+        var curFwdIdx = cpm.topoOrder.indexOf(activeId);
+        var showEF    = (step.type === 'fwd-ef');
+        cpm.topoOrder.forEach(function(id, i) {
+            if (i < curFwdIdx) {
+                _pertSetNodeVal(id, 'es', cpm.ES[id]);
+                _pertSetNodeVal(id, 'ef', cpm.EF[id]);
+            } else if (i === curFwdIdx) {
+                _pertSetNodeVal(id, 'es', cpm.ES[id]);
+                _pertSetNodeVal(id, 'ef', showEF ? cpm.EF[id] : '?');
+            } else {
+                _pertSetNodeVal(id, 'es', '?');
+                _pertSetNodeVal(id, 'ef', '?');
+            }
+            _pertSetNodeVal(id, 'ls', '?');
+            _pertSetNodeVal(id, 'lf', '?');
+            var el = document.getElementById('pn-' + _pSafe(id));
+            if (!el) return;
+            if (i < curFwdIdx)       { el.style.opacity='1';    el.style.filter=''; }
+            else if (i === curFwdIdx) { el.style.opacity='1';    el.style.filter='drop-shadow(0 0 9px rgba(123,16,52,.85))'; }
+            else                      { el.style.opacity='0.18'; el.style.filter=''; }
+        });
+        document.querySelectorAll('.pert-e').forEach(function(eg) {
+            var fi = cpm.topoOrder.indexOf(eg.getAttribute('data-from'));
+            var ti = cpm.topoOrder.indexOf(eg.getAttribute('data-to'));
+            eg.style.opacity = (fi <= curFwdIdx && ti <= curFwdIdx) ? '1' : '0.06';
+        });
+
+    /* PASE INVERSO */
+    } else if (step.type === 'bwd-lf' || step.type === 'bwd-ls') {
+        var curBwdIdx = cpm.revOrder.indexOf(activeId);
+        var showLS    = (step.type === 'bwd-ls');
+        var bwdFullDone = {};
+        for (var bi = 0; bi < curBwdIdx; bi++) bwdFullDone[cpm.revOrder[bi]] = true;
+        if (showLS) bwdFullDone[activeId] = true;
+        cpm.topoOrder.forEach(function(id) {
+            _pertSetNodeVal(id, 'es', cpm.ES[id]);
+            _pertSetNodeVal(id, 'ef', cpm.EF[id]);
+            if (bwdFullDone[id]) {
+                _pertSetNodeVal(id, 'lf', cpm.LF[id]);
+                _pertSetNodeVal(id, 'ls', cpm.LS[id]);
+            } else if (id === activeId) {
+                _pertSetNodeVal(id, 'lf', cpm.LF[id]);
+                _pertSetNodeVal(id, 'ls', '?');
+            } else {
+                _pertSetNodeVal(id, 'lf', '?');
+                _pertSetNodeVal(id, 'ls', '?');
+            }
+            var el = document.getElementById('pn-' + _pSafe(id));
+            if (!el) return;
+            if (id === activeId)       { el.style.opacity='1';    el.style.filter='drop-shadow(0 0 9px rgba(21,101,192,.9))'; }
+            else if (bwdFullDone[id])  { el.style.opacity='1';    el.style.filter=''; }
+            else                       { el.style.opacity='0.55'; el.style.filter=''; }
+        });
+        document.querySelectorAll('.pert-e').forEach(function(eg) { eg.style.opacity='1'; });
+
+    /* PASE DE HOLGURA */
+    } else if (step.type === 'slack') {
+        var slackIdx = cpm.topoOrder.indexOf(activeId);
+        cpm.topoOrder.forEach(function(id) {
+            _pertSetNodeVal(id, 'es', cpm.ES[id]);
+            _pertSetNodeVal(id, 'ef', cpm.EF[id]);
+            _pertSetNodeVal(id, 'ls', cpm.LS[id]);
+            _pertSetNodeVal(id, 'lf', cpm.LF[id]);
+        });
+        var analyzedSet = {};
+        for (var si = 0; si < slackIdx; si++) analyzedSet[cpm.topoOrder[si]] = true;
+        cpm.topoOrder.forEach(function(id, i) {
+            var isCrit = !!cpm.criticas[id];
+            var el = document.getElementById('pn-' + _pSafe(id));
+            if (!el) return;
+            if (i < slackIdx) {
+                _pertNodeMark(id, isCrit);
+                el.style.opacity = '1';
+                el.style.filter  = isCrit ? 'drop-shadow(0 0 6px rgba(21,101,192,.65))' : '';
+            } else if (i === slackIdx) {
+                el.style.opacity = '1';
+                el.style.filter  = 'drop-shadow(0 0 9px rgba(183,119,13,.95))';
+            } else {
+                el.style.opacity = '0.5';
+                el.style.filter  = '';
+            }
+        });
+        pertActividades.forEach(function(a) {
+            a.predecesoras.forEach(function(p) {
+                if (analyzedSet[p] && analyzedSet[a.id])
+                    _pertEdgeMark(p, a.id, !!(cpm.criticas[p] && cpm.criticas[a.id]));
+            });
+        });
+        document.querySelectorAll('.pert-e').forEach(function(eg) {
+            var fi = cpm.topoOrder.indexOf(eg.getAttribute('data-from'));
+            var ti = cpm.topoOrder.indexOf(eg.getAttribute('data-to'));
+            eg.style.opacity = (fi <= slackIdx && ti <= slackIdx) ? '1' : '0.3';
+        });
+    }
+}
+
+function pertPlayGo(n) { pertPlayStopTimer(); pertPlaySetStep(n < 0 ? _pbSteps.length - 1 : n); }
+function pertPlayStep(dir) {
+    pertPlayStopTimer();
+    var cur = (_pbCurrent === null) ? _pbSteps.length - 1 : _pbCurrent;
+    pertPlaySetStep(Math.max(0, Math.min(_pbSteps.length - 1, cur + dir)));
+}
+function pertPlaySeek(n) { pertPlayStopTimer(); pertPlaySetStep(n >= _pbSteps.length - 1 ? null : +n); }
+function pertPlayToggle() {
+    if (_pbTimer) { pertPlayStopTimer(); return; }
+    var btn = document.getElementById('diag-pb-play');
+    if (btn) btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+    var start = (_pbCurrent === null || _pbCurrent >= _pbSteps.length - 1) ? 0 : _pbCurrent + 1;
+    pertPlaySetStep(start);
+    _pbTimer = setInterval(function() {
+        var next = ((_pbCurrent === null ? _pbSteps.length - 1 : _pbCurrent) + 1);
+        if (next >= _pbSteps.length) { pertPlayStopTimer(); pertPlaySetStep(null); }
+        else pertPlaySetStep(next);
+    }, 900);
+}
+function pertPlayStopTimer() {
+    if (_pbTimer) { clearInterval(_pbTimer); _pbTimer = null; }
+    var btn = document.getElementById('diag-pb-play');
+    if (btn) btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+}
+
+/* ================================================================
+    Módulo Ruta Crítica
+================================================================ */
+function pertRenderRutaCritica() {
+    var tbody   = document.getElementById('cuerpo-ruta');
+    var resumen = document.getElementById('rc-resumen');
+    if (!tbody) return;
+    if (pertActividades.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4"><i class="bi bi-info-circle me-2"></i>Agrega actividades y presiona <strong>Calcular</strong></td></tr>';
+        if (resumen) resumen.innerHTML = '';
+        return;
+    }
+    var cpm = pertCalcularCPM();
+    if (!cpm) return;
+    var ES=cpm.ES, EF=cpm.EF, LS=cpm.LS, LF=cpm.LF, T=cpm.T, orden=cpm.orden;
+    tbody.innerHTML = '';
+    var criticas = [];
+    orden.forEach(function(id){
+        var a = pertActividades.find(function(x){ return x.id===id; });
+        var holgura = +(LS[id] - ES[id]).toFixed(2);
+        var critica  = holgura === 0;
+        if (critica) criticas.push(id);
+        var tr = document.createElement('tr');
+        if (critica) tr.className = 'ruta-critica';
+        tr.innerHTML =
+            '<td>' +
+                '<span class="badge ' + (critica ? 'bg-danger' : 'bg-secondary') + ' me-1">' + pertEsc(id) + '</span>' +
+                '<span class="text-muted small">' + pertEsc(a ? a.nombre : '') + '</span>' +
+                (critica ? ' <i class="bi bi-fire text-danger small ms-1" title="Ruta crítica"></i>' : '') +
+            '</td>' +
+            '<td class="fw-semibold text-center">' + ES[id] + '</td>' +
+            '<td class="fw-semibold text-center">' + EF[id] + '</td>' +
+            '<td class="fw-semibold text-center">' + LS[id] + '</td>' +
+            '<td class="fw-semibold text-center">' + LF[id] + '</td>' +
+            '<td class="fw-semibold text-center">' + a.duracion + '</td>' +
+            '<td class="text-center"><span class="badge rounded-pill ' + (critica ? 'bg-danger' : 'bg-success') + '">' + holgura + '</span></td>';
+        tbody.appendChild(tr);
+    });
+    if (resumen) {
+        var flechas = criticas.map(function(id){
+            return '<span class="badge bg-danger px-2 py-1">' + pertEsc(id) + '</span>';
+        }).join('<i class="bi bi-arrow-right-short text-danger mx-1 fs-5 align-middle"></i>');
+        resumen.innerHTML =
+            '<div class="rc-banner mb-3">' +
+                '<div class="rc-banner-header"><i class="bi bi-exclamation-diamond-fill me-2"></i>Ruta Crítica &nbsp;·&nbsp; Duración total: <strong>' + T + ' días</strong></div>' +
+                '<div class="rc-banner-path">' + flechas + '</div>' +
+                '<div class="rc-banner-note"><i class="bi bi-info-circle me-1"></i>Las actividades con holgura = 0 determinan la duración mínima del proyecto. Cualquier retraso en ellas alarga el proyecto.</div>' +
+            '</div>';
+    }
+}
+
+/* ================================================================
+    Diagrama de Gantt
+================================================================ */
+function pertDibujarGantt() {
+    var cont     = document.getElementById('area-gantt');
+    var leyenda  = document.getElementById('gantt-leyenda');
+    var durBadge = document.getElementById('gantt-duracion-total');
+    if (!cont) return;
+    if (pertActividades.length === 0) {
+        cont.className = 'diagrama-placeholder';
+        cont.style     = '';
+        cont.innerHTML = '<i class="bi bi-bar-chart-steps"></i><p class="mb-0 text-center">El diagrama se generará al calcular</p>';
+        if (leyenda)  leyenda.classList.add('d-none');
+        if (durBadge) durBadge.innerHTML = '';
+        return;
+    }
+    var cpm = pertCalcularCPM();
+    if (!cpm) return;
+    var ES = cpm.ES, EF = cpm.EF, LS = cpm.LS, LF = cpm.LF, T = cpm.T, orden = cpm.orden;
+    var LABEL_W  = 240, HEADER_H = 40, ROW_H = 40, BAR_H = 22;
+    var N = pertActividades.length;
+    var DAY_W = Math.max(14, Math.min(44, Math.floor(760 / Math.max(T, 1))));
+    var step  = T <= 20 ? 1 : T <= 40 ? 2 : T <= 80 ? 5 : 10;
+    var SVG_W = LABEL_W + (T + 1) * DAY_W + 12;
+    var SVG_H = HEADER_H + N * ROW_H + 4;
+    var criticas = {};
+    pertActividades.forEach(function(a) {
+        if (+(LS[a.id] - ES[a.id]).toFixed(2) === 0) criticas[a.id] = true;
+    });
+    var bg = '', grid = '', rows = '';
+    bg += '<rect x="0" y="0" width="' + SVG_W + '" height="' + SVG_H + '" fill="#fafafa"/>';
+    bg += '<rect x="0" y="0" width="' + SVG_W + '" height="' + HEADER_H + '" fill="#ede9ed"/>';
+    bg += '<rect x="0" y="0" width="' + LABEL_W + '" height="' + HEADER_H + '" fill="#e0dce0"/>';
+    bg += '<text x="' + (LABEL_W/2) + '" y="' + (HEADER_H/2 + 5) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#444" font-family="sans-serif">Actividad</text>';
+    bg += '<line x1="' + LABEL_W + '" y1="0" x2="' + LABEL_W + '" y2="' + SVG_H + '" stroke="#9a8490" stroke-width="2"/>';
+    for (var d = 0; d <= T; d++) {
+        var gx = LABEL_W + d * DAY_W;
+        var major = (d % step === 0);
+        grid += '<line x1="' + gx + '" y1="' + HEADER_H + '" x2="' + gx + '" y2="' + SVG_H + '" stroke="' + (major ? '#d0c8d0' : '#eae6ea') + '" stroke-width="' + (major ? 1 : 0.5) + '"/>';
+        if (major) {
+            var lx = gx + (step * DAY_W / 2);
+            if (lx < SVG_W - 4) grid += '<text x="' + lx + '" y="' + (HEADER_H/2 + 5) + '" text-anchor="middle" font-size="11" fill="#555" font-family="sans-serif">' + d + '</text>';
+        }
+    }
+    grid += '<line x1="0" y1="' + HEADER_H + '" x2="' + SVG_W + '" y2="' + HEADER_H + '" stroke="#c0b8c0" stroke-width="1.5"/>';
+    orden.forEach(function(id, i) {
+        var a = pertActividades.find(function(x) { return x.id === id; });
+        if (!a) return;
+        var rowY = HEADER_H + i * ROW_H, midY = rowY + ROW_H / 2;
+        var critica = !!criticas[id];
+        var holgura = +(LS[id] - ES[id]).toFixed(2);
+        if (i % 2 === 1) rows += '<rect x="0" y="' + rowY + '" width="' + SVG_W + '" height="' + ROW_H + '" fill="#f5f3f5" opacity="0.5"/>';
+        rows += '<line x1="0" y1="' + (rowY + ROW_H) + '" x2="' + SVG_W + '" y2="' + (rowY + ROW_H) + '" stroke="#e8e4e8" stroke-width="0.8"/>';
+        if (critica) rows += '<rect x="0" y="' + rowY + '" width="' + LABEL_W + '" height="' + ROW_H + '" fill="#fff0f0" opacity="0.8"/>';
+        var badgeColor = critica ? '#e53935' : '#1e88e5';
+        rows += '<rect x="8" y="' + (midY - 11) + '" width="32" height="22" rx="4" fill="' + badgeColor + '"/>';
+        rows += '<text x="24" y="' + (midY + 5) + '" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff" font-family="sans-serif">' + pertEsc(id) + '</text>';
+        var nombre = a.nombre || id;
+        var maxLen = Math.floor((LABEL_W - 50) / 6.8);
+        if (nombre.length > maxLen) nombre = nombre.substring(0, maxLen - 1) + '…';
+        rows += '<text x="46" y="' + (midY + 5) + '" font-size="11" fill="' + (critica ? '#e53935' : '#333') + '" font-family="sans-serif" font-weight="' + (critica ? '600' : 'normal') + '">' + pertEsc(nombre) + '</text>';
+        if (holgura > 0) {
+            var sx = LABEL_W + LS[id] * DAY_W, sw = a.duracion * DAY_W;
+            rows += '<rect x="' + sx + '" y="' + (midY - BAR_H/2) + '" width="' + sw + '" height="' + BAR_H + '" rx="4" fill="#ddd" fill-opacity="0.45" stroke="#bbb" stroke-width="1.2" stroke-dasharray="4,3"/>';
+        }
+        var bx = LABEL_W + ES[id] * DAY_W, bw = a.duracion * DAY_W, by = midY - BAR_H / 2;
+        rows += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + BAR_H + '" rx="4" fill="' + (critica ? '#e53935' : '#1e88e5') + '" stroke="' + (critica ? '#c62828' : '#1565c0') + '" stroke-width="1.5"/>';
+        if (bw >= 28) rows += '<text x="' + (bx + bw/2) + '" y="' + (by + BAR_H/2 + 4) + '" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff" font-family="sans-serif">' + a.duracion + 'd</text>';
+        if (holgura > 0 && DAY_W >= 18) rows += '<text x="' + (LABEL_W + EF[id] * DAY_W + 4) + '" y="' + (midY + 4) + '" font-size="9" fill="#aaa" font-family="sans-serif">+' + holgura + '</text>';
+    });
+    cont.className = '';
+    cont.style.cssText = 'overflow-x:auto;border-radius:8px;border:1px solid #e0dce0;background:#fff;';
+    cont.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + SVG_W + '" height="' + SVG_H + '" style="display:block;min-width:' + SVG_W + 'px;"><defs></defs>' + bg + grid + rows + '</svg>';
+    if (leyenda)  leyenda.classList.remove('d-none');
+    if (durBadge) durBadge.innerHTML = '<span class="badge bg-secondary">Duración total: <strong>' + T + '</strong> días</span>';
+}
+
+/* ── Hooks de tabs ───────────────────────────────────────────── */
+document.addEventListener('shown.bs.tab', function(e) {
+    if (e.target && e.target.id === 'tab-diagrama') pertDibujarDiagrama();
+    if (e.target && e.target.id === 'tab-ruta')     pertRenderRutaCritica();
+    if (e.target && e.target.id === 'tab-gantt')    pertDibujarGantt();
+});
+
+/* ── Arranque ────────────────────────────────────────────────── */
+pertInit();
+    </script>
+</body>
+</html>
